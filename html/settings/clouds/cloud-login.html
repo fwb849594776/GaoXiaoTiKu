@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../../css/api.css">
+  <link rel="stylesheet" href="../../../css/common.css">
+  <link rel="stylesheet" href="../../../css/setting/login.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    div.button:last-child span{
+      background: none;
+      border: solid 0.2vw #1e64c1;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner">
+
+    </div>
+    <div class="content">
+      <div class="logo">
+        <img src="../../../image/pics/logo.png" alt="">
+      </div>
+      <ul>
+        <li class="flex">
+          <img src="../../../image/icons/icon30.png" alt="">
+          <input type="text" placeholder="用户名" v-model="account">
+        </li>
+        <li class="flex">
+          <img src="../../../image/icons/icon31.png" alt="">
+          <input type="text" placeholder="密码" v-model="password">
+        </li>
+      </ul>
+      <div class="funs flex color-99">
+        <span @click="goW('cloudFindPass','./cloud-findPass.html',{},0)">找回密码</span>
+        <span @click="goW('cloudHelp','./cloud-help.html',{},0)">查看帮助？</span>
+      </div>
+      <div class="button">
+        <span @click="login">登录</span>
+      </div>
+      <div class="button">
+        <span class="color-1e64c1" @click="goW('cloudRegister','./cloud-register.html',{},0)">注册</span>
+      </div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+
+    var [html, lis, inputs] = [$api.dom("html"), $api.domAll("li"), $api.domAll("input")];
+    setBgColor(html,type,'page','fpage')
+    lis.forEach(item=>{
+      setTextColor(item,type)
+    })
+    inputs.forEach(item=>{
+      setTextColor(item,type)
+    })
+
+    setHeader({
+      canBack: true,
+      title: '云同步账号',
+      // rType: 'img',
+      // rImg: type == 'white' ? '../../image/icons/icon23.png' : '../../image/icons/icon50.png',
+      bgType: type == 'white' ? false : true,
+  }, type)
+
+    listener('back',function(res){
+      app.closeTo('cloudLogin')
+    })
+
+    listener('keyback',function(res){
+      app.closeTo('cloudLogin')
+    })
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        account:'',
+        password:''
+      },
+      methods:{
+        // 登录
+        login(){
+          if(!this.account){
+            toast('请输入用户名')
+            return
+          }
+          if(!this.password){
+            toast('请输入密码')
+            return
+          }
+          ajax({
+            url:'login',
+            params:{
+              account: this.account,
+              password: this.password
+            },
+            success:(res)=>{
+              toast('登录成功')
+              setStorageFn([{'key': 'token','value': res.data.userinfo.token}, {'key': 'userinfo','value': res.data.userinfo}])
+              sends('login')
+              var _this = this
+              setTimeout(function(){
+                _this.back()
+              },1000)
+            },
+            fail:(err)=>{
+              console.log(JSON.stringify(err));
+            }
+          })
+        }
+      },
+      mounted(){}
+    })
+
+  }
+</script>
+</html>

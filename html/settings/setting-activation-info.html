@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    .content{
+      padding: 0 4vw;
+    }
+    .content>p{
+      font-size: 3.73vw;
+      line-height: 10vw;
+    }
+    .content>p span{
+      margin-left: 2vw;
+    }
+
+    form input,form textarea{
+      width: 92vw;
+    	height: 10.67vw;
+    	background-color: #f6f6f6;
+    	border-radius: 1.47vw;
+      outline: none;
+      margin-bottom: 2.67vw;
+      padding: 0 4vw;
+      box-sizing: border-box;
+      font-size: 3.47vw;
+    }
+
+    form textarea{
+      resize: none;
+      height: 47.87vw;
+      padding: 4vw;
+      line-height: 5vw;
+      text-align: justify;
+    }
+
+    div.button{
+      position: fixed;
+      bottom: 7.2vw;
+    }
+
+    div.button span{
+      width: 92vw;
+      margin-left: 4vw;
+    }
+
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div class="headerInner">
+
+    </div>
+    <div class="content normal-color">
+      <p>设备ID FLGDS8GKJSAKDX;2-DKSAJD <span class="color-1e64c1">复制</span></p>
+      <form action="">
+        <input type="text" placeholder="请输入您的姓名">
+        <input type="text" placeholder="请输入您的电话">
+        <input type="text" placeholder="QQ号码（售后或者忘记注册码凭此号找回）">
+        <input type="text" placeholder="电子邮箱">
+        <input type="text" placeholder="地址（比如：南京 北京）">
+        <textarea name="name" rows="8" cols="80" placeholder="注册码，使用用户可不填"></textarea>
+      </form>
+    </div>
+    <div class="button">
+      <span>
+        点击开始注册激活码
+      </span>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+
+    var [html, normalColor, inputs, textarea] = [$api.dom("html"), $api.dom(".normal-color"), $api.domAll('input'), $api.dom('textarea')];
+    setBgColor(html,type,'page','fpage')
+    $api.css(normalColor, 'color:' + (type == 'white' ? '#333333' : '#ffffff'))
+    inputs.forEach(item =>{
+      setTextColor(item,type)
+    })
+    setTextColor(textarea,type)
+
+    setHeader({
+      canBack: true,
+      title: '激活课程',
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var app = new Vue({
+      el:"#app",
+      data:{},
+      methods:{},
+      mounted(){}
+    })
+
+  }
+</script>
+</html>

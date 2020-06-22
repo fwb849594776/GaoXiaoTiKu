@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../../css/api.css">
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/vant.css">
+    <link rel="stylesheet" href="../../css/me/me-infos.css">
+    <style>
+      .headerInner{
+        height: 12vw;
+      }
+      .button{
+        position: fixed;
+        bottom: 12vw;
+      }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <div class="headerInner"></div>
+        <van-popup v-model="showArea" position="bottom" :safe-area-inset-bottom="true">
+          <van-area title="选择地址" :area-list="areaList" @confirm="confirmArea" @cancel="showArea = false"></van-area>
+        </van-popup>
+        <ul>
+            <li>
+                <span class="normal-color">头像</span>
+                <p>
+                    <img :src="userinfo.avatar" alt="" @click="chooseImg">
+                    <i class="icon"></i>
+                </p>
+            </li>
+            <li @click="editFn">
+                <span class="normal-color">昵称</span>
+                <p>
+                    <span :class="['color-99',{'edit-active' : edit}]">{{userinfo.nickname}}</span>
+                    <i :class="['icon',{'edit-active' : edit}]"></i>
+                </p>
+            </li>
+            <div :class="['edit-name',{'edit-active' : edit}] ">
+                <input type="text" placeholder="请输入您的昵称" v-model="userinfo.nickname">
+            </div>
+            <li>
+                <span class="normal-color">绑定设备</span>
+                <p>
+                    <span class="color-99">{{userinfo.bind_device}}</span>
+                    <i class="icon"></i>
+                </p>
+            </li>
+            <div class="line"></div>
+            <li @click="editRealFn">
+                <span class="normal-color">真实姓名</span>
+                <p>
+                    <span :class="['color-99',{'edit-active' : editreal}]">{{userinfo.realname || ''}}</span>
+                    <i :class="['icon',{'edit-active' : editreal}]"></i>
+                </p>
+            </li>
+            <div :class="['edit-name',{'edit-active' : editreal}] ">
+                <input type="text" placeholder="请输入您的真实姓名" v-model="userinfo.realname">
+            </div>
+            <li @click="showArea = true">
+                <span class="normal-color">所在城市</span>
+                <p>
+                    <span class="color-99">{{userinfo.province_text + '  ' +  userinfo.city_text + '  ' + userinfo.district_text}}</span>
+                    <i class="icon"></i>
+                </p>
+            </li>
+        </ul>
+        <div class="button">
+          <span @click="editprofile">保存</span>
+        </div>
+    </div>
+</body>
+<script src="../../script/api.js"></script>
+<script src="../../script/vue.js"></script>
+<script src="../../script/vant.js"></script>
+<script src="../../script/area.js"></script>
+<script src="../../script/common.js"></script>
+<script src="../../script/router.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        // 自定义夜间模式
+        var type = getStorageFn('type') || 'white'
+
+        setHeader({
+            canBack: true,
+            title: '个人资料',
+            bgType: type == 'white' ? false : true,
+        }, type)
+
+        setCommonListDark(type)
+        var [line, editBox] = [$api.dom('.line'), $api.domAll('input')]
+        setTextColor(line,type)
+        var bgColor = type == 'white' ? '' : '#464444'
+        editBox.forEach(item=>{
+          $api.css(item,'background:' + bgColor)
+        })
+
+        var app = new Vue({
+            el: "#app",
+            data: {
+                edit: false,
+                editreal:false,
+                areaList: areaList,
+                showArea: false,
+                userinfo:{
+                  avatar:'',
+                  nickname:'',
+                  realname: '',
+                  bind_device: '',
+                  province_id: '',
+                  city_id: '',
+                  district_id: '',
+                  province_text: '',
+                  city_text: '',
+                  district_text: ''
+                },
+            },
+            methods: {
+                // 修改用户头像
+                chooseImg() {
+                    var _this = this
+                    api.actionSheet({
+                        title: '',
+                        cancelTitle: '取消',
+                        buttons: ['相册', '相机']
+                    }, function(ret, err) {
+                        var index = ret.buttonIndex;
+                        if(index == 3){
+                          return
+                        }
+                        var sourceType = index == 1 ? 'album' : 'camera'
+                        pushImg(sourceType,function(res){
+                          _this.userinfo.avatar = res
+                        })
+                    });
+                },
+                // 修改昵称
+                editFn(){
+                  this.edit = !this.edit
+                },
+                // 修改真实姓名
+                editRealFn(){
+                  this.editreal = !this.editreal
+                },
+                // 确定地址修改
+                confirmArea(val){
+                  this.showArea = false
+                  this.userinfo.province_id = val[0].code
+                  this.userinfo.province_text = val[0].name
+                  this.userinfo.city_id = val[1].code
+                  this.userinfo.city_text = val[1].name
+                  this.userinfo.district_id = val[2].code
+                  this.userinfo.district_text = val[2].name
+                },
+                // 获取个人信息
+                profile(){
+                  getajax({
+                    url:'profile',
+                    params:{
+                      token:getStorageFn('token')
+                    },
+                    success:(res)=>{
+                      this.userinfo = res.data
+                    },
+                    fail:(err)=>{
+                      console.log(JSON.stringify(err));
+                    }
+                  })
+                },
+                // 修改个人信息
+                editprofile(){
+                  ajax({
+                    url:'profile',
+                    params: {
+                      token: getStorageFn('token'),
+                      avatar: this.userinfo.avatar,
+                      nickname: this.userinfo.nickname,
+                      realname: this.userinfo.realname,
+                      province_id: this.userinfo.province_id,
+                      city_id: this.userinfo.city_id,
+                      district_id: this.userinfo.district_id,
+                    },
+                    success:(res)=>{
+                      toast(res.msg)
+                    },
+                    fail:(err)=>{
+                      console.log(JSON.stringify(err));
+                    }
+                  })
+                }
+            },
+            mounted() {
+              this.profile()
+            }
+        })
+    }
+</script>
+
+</html>

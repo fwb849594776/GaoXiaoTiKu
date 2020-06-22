@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <link rel="stylesheet" href="../../css/subjectList.css">
+  <link rel="stylesheet" href="../../css/mint.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    img{
+      height: 2.67vw
+    }
+    #popup{
+      width: 65.07vw;
+      padding-bottom: 7.73vw;
+    }
+    #popup .popuptitle{
+      line-height: 15vw!important;
+    }
+    #popup div.btns{
+      border-top: 0;
+      flex-wrap: wrap;
+    }
+    #popup div.btns span{
+      width: 34.67vw;
+      margin: 2.67vw auto 0;
+      border-radius: 4vw;
+	    border: solid 0.2vw #1e64c1;
+      line-height: 8vw;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div class="headerInner"></div>
+    <ul>
+      <li @click="toPractice(0)">
+        <div class="list-left">
+          <p class="title normal-color">单选题（章节练习）</p>
+          <p><span class="color-77">答题：</span><span class="color-1e64c1">12/20</span></p>
+        </div>
+        <div>
+          <img src="../../image/icons/icon29.png" alt="">
+        </div>
+      </li>
+      <li @click="toPractice(1)">
+        <div class="list-left">
+          <p class="title normal-color">多选题（章节真题）</p>
+          <p><span class="color-77">答题：</span><span class="color-1e64c1">12/20</span></p>
+        </div>
+        <div>
+          <img src="../../image/icons/icon29.png" alt="">
+        </div>
+      </li>
+      <li @click="toPractice(2)">
+        <div class="list-left">
+          <p class="title normal-color">填空题（章节真题）</p>
+          <p><span class="color-77">答题：</span><span class="color-1e64c1">12/20</span></p>
+        </div>
+        <div>
+          <img src="../../image/icons/icon29.png" alt="">
+        </div>
+      </li>
+      <li @click="toPractice(3)">
+        <div class="list-left">
+          <p class="title normal-color">问答题（章节真题）</p>
+          <p><span class="color-77">答题：</span><span class="color-1e64c1">12/20</span></p>
+        </div>
+        <div>
+          <img src="../../image/icons/icon29.png" alt="">
+        </div>
+      </li>
+    </ul>
+    <mt-popup
+      v-model="popupVisible">
+      <div id="popup">
+        <img src="../../image/icons/close.png" alt="" @click="close">
+        <p class="popuptitle">请选择</p>
+        <div class="btns normal-color">
+          <span class="color-1e64c1" @click="setType(1)">顺序练习</span>
+          <span class="color-1e64c1" @click="setType(2)">随机练习</span>
+        </div>
+      </div>
+    </mt-popup>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/mint.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = 'white'
+    // var type = getStorageFn('type') || 'white'
+    setHeader({
+      canBack:true,
+      title:"类型专项",
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var html = $api.dom('html')
+    setBgColor(html,type,'page')
+
+    refresh('#f6f6f6','#333333',function(res){
+      api.refreshHeaderLoadDone()
+    })
+
+    listener('scrolltobottom',function(res){
+      console.log(JSON.stringify(res));
+    })
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        popupVisible: false,
+        // 练习方式 1 顺序  2 随机
+        type: '',
+        // 0 单选 1 多选 2 填空 3 问答
+        qType: 0,
+      },
+      methods:{
+        close(){
+          this.popupVisible = false
+        },
+        // 设置练习顺序
+        setType(type){
+          this.type = type
+          this.toPractice(this.qType)
+        },
+        toPractice(type){
+          this.qType = type
+          if(!this.type){
+            this.popupVisible = true
+            return
+          }
+          else{
+            this.popupVisible = false
+            this.type = ''
+            this.goW('practiceSpecialTest','./practice-special-test.html',{type:this.type,qType:this.qType},1)
+          }
+        }
+      },
+      mounted(){}
+    })
+  }
+</script>
+</html>

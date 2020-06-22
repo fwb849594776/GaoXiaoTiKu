@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <link rel="stylesheet" href="../../css/subjectList.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    img{
+      height: 2.67vw
+    }
+    p.title{
+      width: 85vw;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner"></div>
+    <ul v-cloak v-if="list.length > 0">
+      <li @click="jump('searchListItem','./search-list-item.html',{itembank_id:item.id},1)" v-for="(item,index) in list" :key="index">
+        <div class="list-left">
+          <p class="title normal-color">{{item.title}}</p>
+        </div>
+        <div>
+          <img src="../../image/icons/icon29.png" alt="">
+        </div>
+      </li>
+    </ul>
+    <div class="noData" v-if="list.length <= 0">未搜索到相关试题~</div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+    setHeader({
+      canBack:true,
+      title:"搜索列表",
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    setCommonListDark(type)
+    var noData = $api.dom('.noData')
+    setTextColor(noData,type,'color')
+
+    // 监听下拉刷新
+    var refreshbgColor = type == 'white' ? '#f6f6f6' : '#000000'
+    var refreshTextColor = type == 'white' ? '#333333' : '#ffffff'
+    refresh(refreshbgColor,refreshTextColor,function(res){
+      app.page = 1
+      app.list = []
+      app.hasmore = true
+      app.search()
+    })
+
+    listener('scrolltoBottom',function(res){
+      if(app.hasmore){
+        app.page ++
+        app.search()
+      }
+      else{
+        toast('没有更多数据了')
+      }
+    })
+
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        keywords:api.pageParam.keywords || '',
+        limit: 10,
+        page: 1,
+        hasmore:true,
+        list:[]
+      },
+      methods:{
+        jump(name,url,params,auth){
+          ajax({
+                  url: 'getSingleItembankInfo',
+                  params: {
+                      token: getStorageFn('token'),
+                      itembank_id: params.itembank_id,
+                  },
+                  success:(res)=>{
+                    this.goW(name,url,params,auth)
+                  },
+                  fail:(err)=>{
+                    if(err.code == 40010){
+                      toast(err.msg)
+                      return
+                    }
+                  }
+                })
+        },
+        // 时间监听
+        listeners() {
+            var _this = this
+                // 监听添加笔记
+            listener('addNote', function() {
+                _this.getNoteList()
+            })
+        },
+        search(){
+          ajax({
+            url:'search',
+            params:{
+              token:getStorageFn('token'),
+              keywords:this.keywords,
+              limit:this.limit,
+              page:this.page
+            },
+            success:(res)=>{
+              if(this.page == res.data.last_page){
+                this.hasmore = false
+              }
+              res.data.data.forEach(item=>{
+                this.list.push(item)
+              })
+              api.refreshHeaderLoadDone()
+            },
+            fail:(err)=>{
+              console.log(JSON.stringify(err));
+            }
+          })
+        }
+      },
+      mounted(){
+        this.search()
+        this.listeners()
+      }
+    })
+  }
+</script>
+</html>

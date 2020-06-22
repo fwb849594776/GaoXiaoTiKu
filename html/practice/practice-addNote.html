@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <link rel="stylesheet" href="../../css/practice/practice-errorSubmit.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div class="headerInner"></div>
+    <div class="textBox">
+      <textarea class="normal-color" name="name" placeholder="请输入您需要添加的笔记" v-model="content">
+      </textarea>
+      <i>{{contentLength}}/500</i>
+    </div>
+    <div class="button">
+      <span @click="addNote">提交</span>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+    setHeader({
+      canBack: true,
+      title: '添加笔记',
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var [html,textBox,normalColor] = [$api.dom("html"),$api.dom(".textBox"),$api.dom(".normal-color")];
+    setBgColor(html,type,'page')
+    setTextColor(textBox,type)
+    setTextColor(normalColor,type)
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        target_id: api.pageParam.target_id || '',
+        content:'',
+        contentLength: 0,
+      },
+      watch:{
+        content(){
+          this.contentLength = this.content.length
+        }
+      },
+      methods:{
+        addNote(){
+          if(!this.content){
+            toast('请输入内容')
+            return
+          }
+          ajax({
+            url:'addNote',
+            params:{
+              token: getStorageFn('token'),
+              target_type: "itembank",
+              target_id: this.target_id,
+              content: this.content
+            },
+            success:(res)=>{
+              toast(res.msg)
+              sends('addNote')
+              var _this = this
+              setTimeout(function(){
+                _this.back()
+              },1000)
+            },
+            fail:(err)=>{
+              console.log(JSON.stringify(err));
+            }
+          })
+        }
+      },
+      mounted(){}
+    })
+  }
+</script>
+</html>

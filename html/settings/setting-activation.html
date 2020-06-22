@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    .content{
+      width: 92vw;
+      margin-top: 4vw;
+      margin: 0 auto;
+      text-align: justify;
+      line-height: 6vw;
+      font-size: 4.53vw;
+    }
+    p{
+      font-size: 3.5vw;
+    }
+    p.title{
+      font-size: 4vw;
+      line-height: 12vw;
+    }
+
+    div.button{
+      position: fixed;
+      bottom: 7.2vw;
+    }
+
+    div.button span{
+      width: 92vw;
+      margin-left: 4vw;
+    }
+
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div class="headerInner">
+
+    </div>
+    <div class="content normal-color">
+      <p class="title">激活须知：</p>
+      <p>1.每一个注册号码可以激活对应的科目，该注册码只可在一台终端上运行；</p>
+      <p>2.对应注册码拥有相应使用周期。</p>
+    </div>
+    <div class="button">
+      <span @click="goW('settingActivationInfo','./setting-activation-info.html',{},1)">填写激活信息</span>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+
+    var [html, normalColor] = [$api.dom("html"), $api.dom(".normal-color")];
+    setBgColor(html,type,'page','fpage')
+    $api.css(normalColor, 'color:' + (type == 'white' ? '#333333' : '#ffffff'))
+
+    setHeader({
+      canBack: true,
+      title: '激活课程',
+      rType: 'text',
+      rText: '更换手机号',
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    // 监听标题事件
+    api.addEventListener({
+        name: 'rightClick'
+    }, function(ret, err){
+        // app.goW('settingPhone','./setting-phone.html',{},1)
+    });
+
+
+    var app = new Vue({
+      el:"#app",
+      data:{},
+      methods:{},
+      mounted(){
+      }
+    })
+
+  }
+</script>
+</html>

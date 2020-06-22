@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../../css/api.css">
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/mint.css">
+    <link rel="stylesheet" href="../../css/practice/practice-test-question.css">
+    <style media="screen">
+        .headerInner {
+            height: 12vw;
+        }
+        .normal-dark-color{
+          color: #fff!important;
+        }
+        .line-dark-color{
+          background-color: rgba(0,0,0,0)
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <div class="headerInner"></div>
+        <div class="content size" v-cloak>
+            <!-- 标题 -->
+            <div :class="['title','normal-color',{'normal-dark-color': type == 'dark'}]">
+                <span>答题时间：2020-01-01</span>
+            </div>
+            <!-- 分割线 -->
+            <div :class="['line','bg-color',{'line-dark-color':type == 'dark'}]"></div>
+            <!-- 题目 -->
+            <div :class="['ques-box','normal-color',{'normal-dark-color':type == 'dark'}]">
+                <p><span class="ques-title">{{qType == 0 ? '单选' : (qType == 1 ? '多选' : (qType == 2 ? '填空题' : (qType == 3 ? '问答题' : '多选')))}}</span>{{ques.title}}</p>
+                <!-- 单选/多选 -->
+                <ul class="radio-box" v-if="qType == 0 || qType == 1">
+                    <li class="item" v-for="(item,index) in ques.options" :key="index">
+                      <span class="option normal-color">{{index}}</span>
+                        <!-- <span class="option normal-color option-active option-error-active">{{index}}</span> -->
+                        <p>{{item.content}}</p>
+                        <!-- <i><img src="../../image/icons/icon34.png" alt=""></i> -->
+                        <!-- <i class="error"><img src="../../image/icons/icon40.png" alt=""></i> -->
+                    </li>
+                </ul>
+                <!-- 填空题 -->
+                <ul class="completion-box" v-if="qType == 2">
+                    <li class="item">
+                        <span class="option normal-color">A</span>
+                        <p>
+                            <input type="text" name="" value="" placeholder="请输入您的答案...">
+                        </p>
+                    </li>
+                </ul>
+                <!-- 问答题 -->
+                <div class="essay" v-if="qType == 3">
+                    <textarea name="name" placeholder="请输入您的答案..."></textarea>
+                </div>
+            </div>
+            <!-- 底部 -->
+            <div class="footer">
+                <div class="bottom2">
+                    <!-- 分割线 -->
+                    <div :class="['line','bg-color','line2',{'line-dark-color':type == 'dark'}]"></div>
+                    <p :class="['normal-color',{'normal-dark-color':type == 'dark'}]"><span class="bottom-title">试题详解</span><span class="error color-99" @click="goW('practiceErrorSubmit','../practice/practice-errorSubmit.html',{},1)">报错</span></p>
+                    <!-- 分割线 -->
+                    <div :class="['line','bg-color','line3',{'line-dark-color':type == 'dark'}]"></div>
+                    <div>
+                        <p class="color-1e64c1">答案：B</p>
+                        <div :class="['content','normal-color',{'normal-dark-color':type == 'dark'}]">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis.
+                        </div>
+                    </div>
+                    <!-- 分割线 -->
+                    <div :class="['line','bg-color','line2',{'line-dark-color':type == 'dark'}]"></div>
+                    <p :class="['normal-color',{'normal-dark-color':type == 'dark'}]"><span class="bottom-title">考试笔记</span></p>
+                    <!-- 分割线 -->
+                    <div :class="['line','bg-color','line3',{'line-dark-color':type == 'dark'}]"></div>
+                    <ul :class="['normal-color',{'normal-dark-color':type == 'dark'}]">
+                        <li>
+                            <p>2020-10-01</p>
+                            <div class="content">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis.
+                            </div>
+                        </li>
+                        <li>
+                            <p>2020-10-01</p>
+                            <div class="content">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis.
+                            </div>
+                        </li>
+                        <div class="noData">您还未添加笔记~</div>
+                    </ul>
+                    <div class="button">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/mint.js"></script>
+<script type="text/javascript" src="../../script/rem.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        // 自定义夜间模式
+        var type = getStorageFn('type') || 'white'
+        setHeader({
+            canBack: true,
+            title: '一级建造管理',
+            bgType: type == 'white' ? false : true,
+        }, type)
+
+        var [html, title, content] = [$api.dom('html'), $api.dom('.title'), $api.dom('.size')]
+        setBgColor(html, type, 'page', 'page2')
+        $api.css(title, 'top:' + (api.safeArea.top + (api.winWidth / 100) * 12) + 'px')
+
+        refresh('#f6f6f6','#333333',function(res){
+          api.refreshHeaderLoadDone()
+        })
+
+        listener('scrolltobottom',function(res){
+          console.log(JSON.stringify(res));
+        })
+
+        // 设置字体大小
+        var size = getStorageFn('size') || 26
+        $api.css(content,'font-size:' + (size / 100) + 'rem')
+
+        var app = new Vue({
+            el: "#app",
+            data: {
+                // 自定义夜间模式
+                type: type,
+                // 弹框
+                popupVisible: false,
+                popupVisible2: false,
+                popupVisible3: false,
+                titleActive: 0,
+                // 做到第n题
+                index:0,
+                // 0 单选 1 多选 2 填空 3 问答
+                qType: 0,
+                ques:{
+                  id:1,
+                  title:'下列选项中16进制的是？',
+                  options:{
+                    'A':{
+                      content:'36A'
+                    },
+                    'B':{
+                      content:'36B'
+                    },
+                    'C':{
+                      content:'36C'
+                    },
+                    'D':{
+                      content:'36D'
+                    }
+                  },
+                  type:0,
+                  correctOption:['A'],
+                  myQues:[],
+                },
+                ids:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],
+                list:[
+                  {
+                    id:1,
+                    title:'下列选项中16进制的是？',
+                    options:{
+                      'A':{
+                        content:'36A'
+                      },
+                      'B':{
+                        content:'36B'
+                      },
+                      'C':{
+                        content:'36C'
+                      },
+                      'D':{
+                        content:'36D'
+                      }
+                    },
+                    type:0,
+                    correctOption:['A'],
+                    myQues:[],
+                  },
+                  {
+                    id:2,
+                    title:'下列选项中16进制的是？',
+                    options:{
+                      'A':{
+                        content:'36A'
+                      },
+                      'B':{
+                        content:'36B'
+                      },
+                      'C':{
+                        content:'36C'
+                      },
+                      'D':{
+                        content:'36D'
+                      }
+                    },
+                    type:1,
+                    correctOption:['A','B'],
+                    myQues:[],
+                  },
+                  {
+                    id:3,
+                    title:'112的二进制是______16进制是________？',
+                    options:{
+                      'A':{
+                        content:''
+                      },
+                      'B':{
+                        content:''
+                      },
+                    },
+                    type:2,
+                    correctOption:['26','48'],
+                    myQues:[],
+                  },
+                  {
+                    id:4,
+                    title:'二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些？',
+                    type:3,
+                    correctOption:'二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些',
+                    myQues:[],
+                  },
+                  {
+                    id:5,
+                    title:'下列选项中16进制的是？',
+                    options:{
+                      'A':{
+                        content:'36A'
+                      },
+                      'B':{
+                        content:'36B'
+                      },
+                      'C':{
+                        content:'36C'
+                      },
+                      'D':{
+                        content:'36D'
+                      }
+                    },
+                    type:0,
+                    correctOption:['A'],
+                    myQues:[],
+                  },
+                  {
+                    id:6,
+                    title:'下列选项中16进制的是？',
+                    options:{
+                      'A':{
+                        content:'36A'
+                      },
+                      'B':{
+                        content:'36B'
+                      },
+                      'C':{
+                        content:'36C'
+                      },
+                      'D':{
+                        content:'36D'
+                      }
+                    },
+                    type:1,
+                    correctOption:['A','B'],
+                    myQues:[],
+                  },
+                  {
+                    id:7,
+                    title:'112的二进制是______16进制是________？',
+                    options:{
+                      'A':{
+                        content:''
+                      },
+                      'B':{
+                        content:''
+                      },
+                    },
+                    type:2,
+                    correctOption:['26','48'],
+                    myQues:[],
+                  },
+                  {
+                    id:8,
+                    title:'二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些？',
+                    type:3,
+                    correctOption:'二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些',
+                    myQues:[],
+                  },
+                  {
+                    id:9,
+                    title:'下列选项中16进制的是？',
+                    options:{
+                      'A':{
+                        content:'36A'
+                      },
+                      'B':{
+                        content:'36B'
+                      },
+                      'C':{
+                        content:'36C'
+                      },
+                      'D':{
+                        content:'36D'
+                      }
+                    },
+                    type:0,
+                    correctOption:['A'],
+                    myQues:[],
+                  },
+                  {
+                    id:10,
+                    title:'下列选项中16进制的是？',
+                    options:{
+                      'A':{
+                        content:'36A'
+                      },
+                      'B':{
+                        content:'36B'
+                      },
+                      'C':{
+                        content:'36C'
+                      },
+                      'D':{
+                        content:'36D'
+                      }
+                    },
+                    type:1,
+                    correctOption:['A','B'],
+                    myQues:[],
+                  },
+                  {
+                    id:11,
+                    title:'112的二进制是______16进制是________？',
+                    options:{
+                      'A':{
+                        content:''
+                      },
+                      'B':{
+                        content:''
+                      },
+                    },
+                    type:2,
+                    correctOption:['26','48'],
+                    myQues:[],
+                  },
+                  {
+                    id:12,
+                    title:'二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些？',
+                    type:3,
+                    correctOption:'二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些',
+                    myQues:[],
+                  },
+                  {
+                    id:13,
+                    title:'下列选项中16进制的是？',
+                    options:{
+                      'A':{
+                        content:'36A'
+                      },
+                      'B':{
+                        content:'36B'
+                      },
+                      'C':{
+                        content:'36C'
+                      },
+                      'D':{
+                        content:'36D'
+                      }
+                    },
+                    type:0,
+                    correctOption:['A'],
+                    myQues:[],
+                  },
+                  {
+                    id:14,
+                    title:'下列选项中16进制的是？',
+                    options:{
+                      'A':{
+                        content:'36A'
+                      },
+                      'B':{
+                        content:'36B'
+                      },
+                      'C':{
+                        content:'36C'
+                      },
+                      'D':{
+                        content:'36D'
+                      }
+                    },
+                    type:1,
+                    correctOption:['A','B'],
+                    myQues:[],
+                  },
+                  {
+                    id:15,
+                    title:'112的二进制是______16进制是________？',
+                    options:{
+                      'A':{
+                        content:''
+                      },
+                      'B':{
+                        content:''
+                      },
+                    },
+                    type:2,
+                    correctOption:['26','48'],
+                    myQues:[],
+                  },
+                  {
+                    id:16,
+                    title:'二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些？',
+                    type:3,
+                    correctOption:'二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些二进制、十进制、十六进制之间如果转换，进制转化需要注意的有哪些',
+                    myQues:[],
+                  },
+                ]
+            },
+            methods: {
+            },
+            mounted() {
+            }
+        })
+    }
+</script>
+
+</html>

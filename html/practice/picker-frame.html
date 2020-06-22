@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/vant.css">
+  <style media="screen">
+    html,body{
+      background: transparent;
+      width: 100%;
+      height: 100%;
+    }
+    #mask{
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0)
+    }
+    .van-picker{
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div id="mask">
+      <van-overlay :show="show" @click="cancel">
+        <div class="wrapper" @click.stop>
+          <div class="block">
+            <van-datetime-picker
+                v-model="currentDate"
+                type="date"
+                title="自定义考试时间"
+                :min-date="minDate"
+                :max-date="maxDate"
+                @confirm="confirm"
+                @cancel="cancel"
+              />
+           </div>
+        </div>
+      </van-overlay>
+
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/vant.js"></script>
+<script type="text/javascript">
+apiready = function(){
+  var app = new Vue({
+    el:"#app",
+    data:{
+      show: true,
+      minDate: api.pageParam.date ? new Date(api.pageParam.date) : new Date(),
+      maxDate: new Date(2025, 10, 1),
+      currentDate: new Date(),
+    },
+    methods:{
+      confirm(){
+        const d = new Date(this.currentDate)
+        const resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate())
+        api.sendEvent({
+            name: 'pickerConfirm',
+            extra: {
+                date: resDate,
+            }
+        });
+      },
+      p(s) {
+        return s < 10 ? '0' + s : s
+      },
+      cancel(){
+        api.sendEvent({
+            name: 'pickerCancel',
+        });
+      },
+    },
+    mounted(){
+    }
+  })
+}
+</script>
+</html>

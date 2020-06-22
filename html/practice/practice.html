@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../../css/api.css">
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/practice/practice.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <div class="header">
+            <img src="../../image/icons/menu.png" alt="" @click="goW('switchSubject','../settings/setting-switch-subject.html',{},1)">
+            <span>{{course_title}}</span>
+            <img src="../../image/icons/setting.png" alt="" @click="goW('setting','../settings/setting.html',{},1)">
+        </div>
+        <div class="content">
+            <p class="count" @click="openPicker">距离考试还有<span>{{time.d}}</span>天<span>  {{time.h}}  </span>小时<span>  {{time.m}}  </span>分<span>  {{time.s}}  </span>秒</p>
+            <ul class="small-title">
+                <li>
+                    <p>{{user_course_statistics_info.mastery_count}}</p>
+                    <p>掌握度</p>
+                </li>
+                <li @click="sends('toWrong')">
+                    <p>{{user_course_statistics_info.error_record_count}}</p>
+                    <p>错题</p>
+                </li>
+                <li @click="jumps('meCollect','../me/me-collect.html',{},1)">
+                    <p>{{user_course_statistics_info.collect_count}}</p>
+                    <p>收藏</p>
+                </li>
+                <li @click="jumps('meNote','../me/me-note.html',{},1)">
+                    <p>{{user_course_statistics_info.note_count}}</p>
+                    <p>笔记</p>
+                </li>
+            </ul>
+        </div>
+        <div class="seat1"></div>
+        <div class="seat2"></div>
+        <ul class="bulleted-list">
+            <li @click="jump('practiceOrder','./practice-order.html',{list:list},1)">
+                <img src="../../image/icons/icon1.png" alt="">
+                <p class="normal-color">顺序练习</p>
+            </li>
+            <li @click="jump('practiceRandom','./practice-random.html',{},1)">
+                <img src="../../image/icons/icon2.png" alt="">
+                <p class="normal-color">随机练习</p>
+            </li>
+            <li @click="jump('practiceSimulation','./practice-simulation.html',{},1)">
+                <img src="../../image/icons/icon3.png" alt="">
+                <p class="normal-color">模拟练习</p>
+            </li>
+            <li @click="jump('practiceReal','./practice-real.html',{},1)">
+                <img src="../../image/icons/icon4.png" alt="">
+                <p class="normal-color">真题练习</p>
+            </li>
+            <li @click="jump('practiceSpecial','./practice-special.html',{},1)">
+                <img src="../../image/icons/icon5.png" alt="">
+                <p class="normal-color">专项练习</p>
+            </li>
+            <li @click="jump('practiceRandomQues','./practice-random-ques.html',{},1)">
+                <img src="../../image/icons/icon6.png" alt="">
+                <p class="normal-color">随机组卷</p>
+            </li>
+            <li @click="jump('practiceTest','./practice-test.html',{},1)">
+                <img src="../../image/icons/icon7.png" alt="">
+                <p class="normal-color">测试</p>
+            </li>
+        </ul>
+        <div class="tree-dom">
+          <div class="demo-box"  v-for="(item,index) in treeData" :key="index">
+            <ul id="demo">
+                <tree-item class="item" v-for="(items,indexs) in item.children" :item="items" :key="index" @make-folder="makeFolder" @add-item="addItem"></tree-item>
+            </ul>
+          </div>
+        </div>
+    </div>
+</body>
+<!-- item template -->
+<script type="text/x-template" id="item-template">
+    <li :class="{'folder-active': isFolder}">
+      <div :class="{bold: isFolder}" @click="toggle(item.taxonomy,item.id,item.itembank_count)">
+            <span v-if="isFolder" class="folder"><img :src="isOpen ? '../../image/icons/icon8.png' : '../../image/icons/icon9.png'" alt=""></span>
+            <span v-else class="folder"><img src="../../image/icons/icon10.png" alt=""></span>
+            <span class="title  title-color">{{ item.title }} <span style="float:right" v-if="item.taxonomy == 'test'">{{item.answer_record_count}}/{{item.itembank_count}}</span></span>
+        </div>
+        <ul v-show="isOpen" v-if="isFolder">
+            <tree-item class="item" v-for="(child, index) in item.children" :key="index" :item="child" @make-folder="$emit('make-folder', $event)" @add-item="$emit('add-item', $event)"></tree-item>
+        </ul>
+    </li>
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        // 是否开启夜间模式
+        var type = getStorageFn('type') || 'white'
+
+        var [header, content, seat1, seat2, bulletedList, normalColor, demoBox] = [$api.dom('.header'), $api.dom('.content'), $api.dom('.seat1'), $api.dom('.seat2'), $api.dom('.bulleted-list'), $api.domAll('.normal-color'), $api.domAll('.demo-box')]
+        setBgColor(header, type)
+        setBgColor(content, type)
+        setBgColor(seat1, type)
+        setBgColor(seat2, type)
+        setTextColor(bulletedList, type)
+        demoBox.forEach(item=>{
+          setTextColor(item, type)
+        })
+        normalColor.forEach(item=>{
+          setTextColor(item, type)
+        })
+
+        $api.css(header, 'padding-top:' + api.safeArea.top + 'px')
+        $api.fixStatusBar(header);
+        var headerH = (api.safeArea.top + (api.winWidth / 100) * 12) + 'px';
+        $api.css(content, 'padding-top:' + headerH)
+
+        // 监听日期选择事件
+        listener('pickerCancel',function(){
+          closeF('pickerFrame')
+        })
+        listener('pickerConfirm',function(ret){
+          app.confirm(ret.value.date)
+        })
+
+        // 监听课程切换
+        listener('setCourse',function(res){
+          app.getCourseInfo()
+          if(!getGlobalDataFn('exam_time')){
+            return
+          }
+          else{
+            app.date = getTime(getGlobalDataFn('exam_time') * 1000)
+          }
+          app.getDuration()
+        })
+
+        listener('login',function(res){
+          app.getCourseInfo()
+          if(!getGlobalDataFn('exam_time')){
+            return
+          }
+          else{
+            app.date = getTime(getGlobalDataFn('exam_time') * 1000)
+          }
+          app.getDuration()
+        })
+
+        // 监听下拉刷新
+        var refreshbgColor = type == 'white' ? '#1e64c1' : '#000000'
+        refresh(refreshbgColor,'#ffffff',function(res){
+          app.getCourseInfo()
+          if(!getGlobalDataFn('exam_time')){
+            return
+          }
+          else{
+            app.date = getTime(getGlobalDataFn('exam_time') * 1000)
+          }
+          clearInterval(st)
+          app.getDuration()
+        })
+
+        var st;
+
+        Vue.component("tree-item", {
+            template: "#item-template",
+            props: {
+                item: Object
+            },
+            data: function() {
+                return {
+                    isOpen: false
+                };
+            },
+            computed: {
+                isFolder: function() {
+                    return this.item.children && this.item.children.length;
+                }
+            },
+            methods: {
+                toggle: function(type,id,total) {
+                    if(type == 'test'){
+                      if(total <= 0){
+                        toast('暂无试题信息')
+                        return
+                      }
+                      ajax({
+                          url:'getItembankInfo',
+                          params:{
+                            token: getStorageFn('token'),
+                            test_id: id,
+                            page: 1
+                          },
+                          success:(res)=>{
+                            this.goW('practiceQues','./practice-ques.html',{id:id},1)
+                          },
+                          fail:(err)=>{
+                            if(err.code == 40010){
+                              toast(err.msg)
+                              return
+                            }
+                          }
+                        })
+                      // this.goW('practiceQues','./practice-ques.html',{id:id},1)
+                    }
+                    if (this.isFolder) {
+                        this.isOpen = !this.isOpen;
+                    }
+                },
+            }
+        });
+
+        var app = new Vue({
+            el: "#app",
+            data: {
+                time: {},
+                treeData: [],
+                date: '',
+                startTime:'',
+                course_title:'请选择科目',
+                user_course_statistics_info:{
+                  mastery_count : '0%',
+                  error_record_count : 0,
+                  collect_count : 0,
+                  note_count : 0,
+                },
+                list:[]
+            },
+            methods: {
+                makeFolder: function(item) {
+                    Vue.set(item, "children", []);
+                    this.addItem(item);
+                },
+                addItem: function(item) {
+                    item.children.push({
+                        name: "new stuff"
+                    });
+                },
+                sends: function(name){
+                  sends(name)
+                },
+                // 页面跳转
+                jump(name,url,params,auth){
+                  toast('敬请期待...')
+                  return
+                  this.goW(name,url,params,auth)
+                },
+                jumps(name,url,params,auth){
+                  if(!getGlobalDataFn('course_id')){
+                    toast('请先选择科目!')
+                    return
+                  }
+                  this.goW(name,url,params,auth)
+                },
+                // 获取课程详情
+                getCourseInfo: function(){
+                  if(!getGlobalDataFn('course_id')){
+                    toast('请先选择科目!')
+                    // var _this = this
+                    // setTimeout(function(){
+                    //   _this.goW('switchSubject','../settings/setting-switch-subject.html',{},0)
+                    // },1000)
+                    api.refreshHeaderLoadDone();
+                    return
+                  }
+                  this.treeData = []
+                  ajax({
+                    url:'getCourseInfo',
+                    params:{
+                      token:getStorageFn('token'),
+                      course_id:getGlobalDataFn('course_id')
+                    },
+                    success:(res)=>{
+                      api.refreshHeaderLoadDone();
+                      this.course_title = res.data.course_info.title
+                      this.list = res.data.test_list
+                      this.user_course_statistics_info = res.data.user_course_statistics_info
+                      res.data.test_list.forEach(item=>{
+                        this.treeData.push({
+                          children : [item]
+                        })
+                      })
+                    },
+                    fail:(err)=>{
+                      console.log(JSON.stringify(err));
+                    }
+                  })
+                },
+                // 倒计时开始
+                getDuration() {
+                    var _this = this
+                    var date = this.date
+                    var dateArr = date.split('-')
+                    var fdate = ''
+                    dateArr.forEach(item=>{
+                      fdate += item + '/'
+                    })
+                    if(!date){
+                      return
+                    }
+                    var datetime = new Date(fdate.slice(0,-1)).getTime()
+                    st = setInterval(function() {
+                        var result = getduration(datetime / 1000)
+                        _this.time = result
+                    }, 1000)
+                },
+                // 选择日期
+                openPicker() {
+                    if(!getGlobalDataFn('exam_time')){
+                      toast('请先选择科目!')
+                      return
+                    }
+                    var w = api.winWidth
+                    var h = api.winHeight
+                    var animation = {
+                      type:"fade",
+                      duration:100
+                    }
+                    goF('pickerFrame','./picker-frame.html',{date:this.date ? this.date : this.startTime},0,0,w,h,0,false,'rgba(0,0,0,0)',animation)
+                },
+                // 确定考试时间
+                confirm(date){
+                  clearInterval(st)
+                  this.date = date
+                  var time = new Date(date).getTime()
+                  setGlobalDataFn('exam_time', (time / 1000))
+                  this.getDuration()
+                  closeF('pickerFrame')
+                },
+                // 选择日期从明天开始定义
+                getTimeFn(){
+                  var timestamp = (new Date()).getTime()
+                  var nexttimestamp = (timestamp * 1) + (24 * 60 * 60 * 1000)
+                  this.startTime = getTime(nexttimestamp)
+                }
+            },
+            mounted() {
+                this.getCourseInfo()
+                this.getTimeFn()
+                // 已定义考试时间开启倒计时
+                if(!getGlobalDataFn('exam_time')){
+                  return
+                }
+                else{
+                  this.date = getTime(getGlobalDataFn('exam_time') * 1000)
+                }
+                this.getDuration()
+            },
+            destroyed() {
+                clearInterval(st)
+            }
+        })
+    }
+</script>
+</html>

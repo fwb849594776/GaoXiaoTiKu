@@ -1,0 +1,66 @@
+.headerInner{
+  height: 12vw;
+}
+.content ul{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 2vw 0;
+}
+.content ul li{
+  width: 6.67vw;
+  line-height: 6.67vw;
+  border-radius: 1.33vw;
+  border: solid 0.2vw #cccccc;
+  text-align: center;
+  margin: 2.535vw 6.535vw;
+  font-size: 3.5vw;
+}
+.content ul li:nth-child(5n){
+  margin: 0 0 0 6.535vw;
+}
+.content ul li.error{
+  border: 0;
+  background-image: url('../../image/icons/icon47.png');
+  background-size: cover;
+  color: #fd2929
+}
+.content ul li.correct{
+  border: 0;
+  background-image: url('../../image/icons/icon45.png');
+  background-size: cover;
+  color: #1e64c1
+}
+.content ul li.warn{
+  border: 0;
+  background-image: url('../../image/icons/icon46.png');
+  background-size: cover;
+  color: #ff7e00
+}
+.content>p{
+  line-height: 12vw;
+  font-size: 3.73vw;
+  padding: 0 4vw;
+  border-bottom: 0.2vw solid #eee;
+}
+.bottom{
+  position: fixed;
+  width: 100%;
+  box-sizing: border-box;
+  height: 13.33vw;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4vw;
+  align-items: center;
+  background: #fff;
+}
+.bottom span{
+  width: 29.73vw;
+  line-height: 7.33vw;
+  border-radius: 3.67vw;
+  border: solid 0.2vw #2166c2;
+  text-align: center;
+  color: #2166c2;
+}

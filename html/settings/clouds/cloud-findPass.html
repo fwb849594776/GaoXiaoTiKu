@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../../css/api.css">
+  <link rel="stylesheet" href="../../../css/common.css">
+  <link rel="stylesheet" href="../../../css/setting/login.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    li:nth-of-type(1){
+      margin-top: 14.53vw;
+    }
+    li:nth-of-type(2) img{
+      height: 3.07vw;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner">
+
+    </div>
+    <div class="content">
+      <ul>
+        <li class="flex">
+          <img src="../../../image/icons/icon30.png" alt="">
+          <input type="text" placeholder="用户名" v-model="account">
+        </li>
+        <li class="flex">
+          <img src="../../../image/icons/icon33.png" alt="">
+          <input type="text" placeholder="邮箱" v-model="email">
+        </li>
+      </ul>
+      <div class="funs flex color-99"  @click="goW('cloudHelp','./cloud-help.html',{},0)">
+        查看帮助？
+      </div>
+      <div class="button">
+        <span @click="resetpwdByEmail">确认</span>
+      </div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+
+    var [html, inputs] = [$api.dom("html"), $api.domAll("li")];
+    setBgColor(html,type,'page','fpage')
+    inputs.forEach(item=>{
+      setTextColor(item,type)
+    })
+
+    setHeader({
+      canBack: true,
+      title: '找回密码',
+      // rType: 'img',
+      // rImg: type == 'white' ? '../../image/icons/icon23.png' : '../../image/icons/icon50.png',
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        account:'',
+        email:'',
+      },
+      methods:{
+        resetpwdByEmail(){
+          if(!this.account){
+            toast('请输入用户名')
+            return
+          }
+          if(!this.email){
+            toast('请输入邮箱')
+            return
+          }
+          ajax({
+            url:'resetpwdByEmail',
+            params:{
+              account: this.account,
+              email: this.email
+            },
+            success:(res)=>{
+              toast(res.msg)
+              var _this = this
+              setTimeout(function(){
+                _this.back()
+              },1000)
+            },
+            fail:(err)=>{
+              console.log(JSON.stringify(err));
+            }
+          })
+        }
+      },
+      mounted(){}
+    })
+
+  }
+</script>
+</html>

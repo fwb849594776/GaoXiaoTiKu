@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    .content{
+      padding: 8vw 4vw 0;
+      font-size: 3.5vw;
+      line-height: 7vw;
+      background: #ffffff;
+    }
+    .content>p:first-child{
+      font-size: 4.8vw;
+      font-weight: bolder;
+      padding-bottom: 0;
+    }
+    .content>p{
+      padding-bottom: 7.6vw;
+    }
+    div.line{
+      height: 2vw;
+      width: 100vw;
+      margin-left: -4vw;
+    }
+    p.number{
+      line-height: 12vw;
+      font-size: 3.5vw;
+      padding-bottom: 0;
+    }
+    p.number input{
+      outline: none;
+      width: 100%;
+    }
+    div.button{
+      position: fixed;
+      bottom: 5.33vw;
+    }
+    div.button span{
+      width: 92vw;
+      margin-left: 4vw;
+    }
+    p.send{
+      line-height: 8vw;
+      padding-bottom: 0;
+      width: 100vw;
+      margin-left: -4vw;
+      padding: 0 4vw;
+      box-sizing: border-box;
+      font-size: 3vw;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner">
+    </div>
+    <div class="content">
+      <p>获取验证码</p>
+      <p class="color-99">我们给您的要绑定的手机号发送了一条验证短信</p>
+      <div class="line bg-color"></div>
+      <p class="number"><input type="text" placeholder="输入短信验证码..."></p>
+      <p class="send color-1e64c1 bg-color">重新发送</p>
+    </div>
+    <div class="button">
+      <span>更换完成</span>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = 'white'
+    // var type = getStorageFn('type') || 'white'
+
+    var html = $api.dom("html");
+    setBgColor(html,type,'page')
+
+    setHeader({
+      canBack: true,
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var app = new Vue({
+      el:"#app",
+      data:{},
+      methods:{},
+      mounted(){}
+    })
+
+  }
+</script>
+</html>

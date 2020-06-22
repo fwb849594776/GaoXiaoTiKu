@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <link rel="stylesheet" href="../../css/mint.css">
+  <link rel="stylesheet" href="../../css/practice/practice-random-ques.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div class="headerInner"></div>
+    <ul>
+      <li>
+        <p class="normal-color">单选题（共60题）</p>
+        <div>
+          <i class="color-1e64c1">55%</i>
+          <p>
+            <span></span>
+          </p>
+        </div>
+      </li>
+      <li>
+        <p class="normal-color">多选题（共60题）</p>
+        <div>
+          <i class="color-1e64c1">55%</i>
+          <p>
+            <span></span>
+          </p>
+        </div>
+      </li>
+    </ul>
+    <div class="button">
+      <span  @click="toPractice">开始答题</span>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/mint.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = 'white'
+    // var type = getStorageFn('type') || 'white'
+    setHeader({
+      canBack:true,
+      title:"随机组卷",
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var html = $api.dom('html')
+    setBgColor(html,type,'page','randomPage')
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        // 0 单选 1 多选 2 填空 3 问答
+        qType: 0,
+      },
+      methods:{
+        toPractice(type){
+          this.qType = type
+          this.goW('practiceQues','./practice-test-question.html',{},1)
+        }
+      },
+      mounted(){}
+    })
+  }
+</script>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <link rel="stylesheet" href="../../css/subjectList.css">
+  <link rel="stylesheet" href="../../css/mint.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    img{
+      height: 2.67vw
+    }
+    .noData{
+      color: #333;
+      line-height: 20vw;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner" v-cloak></div>
+    <!-- <mt-popup
+      v-model="popupVisible">
+      <div id="popup">
+        <img src="../../image/icons/close.png" alt="" @click="close">
+        <p class="popuptitle">找到做题记录，继续上次练习？</p>
+        <div class="btns normal-color">
+          <span @click="toRecord('continute')">看错题</span>
+          <span @click="toRecord('restart')">重新开始</span>
+        </div>
+      </div>
+    </mt-popup> -->
+    <ul>
+      <li  @click="jump(item.id,item.answer_record_count)" v-for="(item,index) in list" :key="index">
+        <div class="list-left">
+          <p class="title normal-color">{{item.title}}</p>
+          <p>
+            <span class="color-77">答题：</span><span class="color-1e64c1">{{item.answer_record_count}}/{{item.itembank_count}}</span>
+            <span class="color-77" style="margin-left:5vw">错题：</span><span class="color-1e64c1">{{item.error_record_count}}/{{item.answer_record_count}}</span>
+          </p>
+        </div>
+        <div>
+          <img src="../../image/icons/icon29.png" alt="">
+        </div>
+      </li>
+    </ul>
+    <div class="noData" v-if="list.length <= 0">暂无错题记录~</div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/mint.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+    setHeader({
+      canBack:true,
+      title:"错题记录",
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    setCommonListDark(type)
+    var noData = $api.dom('.noData')
+    setTextColor(noData,type,'color')
+
+    var refreshbgColor = type == 'white' ? '#f6f6f6' : '#000000'
+    var refreshTextColor = type == 'white' ? '#333333' : '#ffffff'
+    refresh(refreshbgColor,refreshTextColor,function(res){
+      app.list = []
+      app.getErrorRecordListByType()
+    })
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        type: api.pageParam.type || '',
+        list: [],
+        popupVisible: false,
+        id:'',
+      },
+      methods:{
+        getErrorRecordListByType(){
+          ajax({
+            url:'getErrorRecordListByType',
+            params:{
+              token: getStorageFn('token'),
+              course_id: getGlobalDataFn('course_id'),
+              type: this.type
+            },
+            success:(res)=>{
+              if(res.data){
+                this.list = res.data
+              }
+              else{
+                this.list = []
+              }
+              api.refreshHeaderLoadDone()
+            },
+            fail:(err)=>{
+              console.log(JSON.stringify(err));
+            }
+          })
+        },
+        close(){
+          this.popupVisible = false
+        },
+        jump(id,total){
+          if(total <= 0){
+            toast('暂无错题信息')
+            return
+          }
+          this.id = id
+          this.toRecord()
+          // this.popupVisible = true
+        },
+        toRecord(){
+          this.popupVisible = false
+          this.goW('wrongListItem','./wrong-list-item.html',{id:this.id},1)
+        }
+      },
+      mounted(){
+        this.getErrorRecordListByType()
+      }
+    })
+  }
+</script>
+</html>

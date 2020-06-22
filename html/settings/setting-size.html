@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <link rel="stylesheet" href="../../css/mint.css">
+  <style media="screen">
+    .header-inner{
+      height: 12vw;
+    }
+    .content{
+      width: 92vw;
+      margin: 0 auto;
+    }
+    p{
+      font-size: 4vw;
+      line-height: 12vw;
+    }
+    .mt-range-runway{
+      border-radius: 7.5px;
+    }
+    .mt-range-progress{
+      background-color: #1e64c1;
+      border-radius: 7.5px 0 0 7.5px;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner"></div>
+    <div class="content">
+      <p class="normal-color">文字大小：{{rangeValue}}</p>
+      <mt-range
+        v-model="rangeValue"
+        :min="20"
+        :max="54"
+        :step="1"
+        :bar-height="15">
+      </mt-range>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/mint.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+
+    var [html, normalColor] = [$api.dom("html"), $api.dom(".normal-color")];
+    setBgColor(html,type,'page','settingSize')
+    $api.css(normalColor,'color:' + (type == 'white' ? '' : '#ffffff'))
+
+    setHeader({
+      canBack: true,
+      title: '文字大小',
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var size = (getStorageFn('size') * 1) || 26;
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        rangeValue: size
+      },
+      watch:{
+        rangeValue(){
+          size = this.rangeValue
+          setStorageFn([{key:'size',value:size}])
+        }
+      },
+      methods:{},
+      mounted(){}
+    })
+  }
+</script>
+</html>

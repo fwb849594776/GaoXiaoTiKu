@@ -1,0 +1,52 @@
+img{
+  height: 2.67vw
+}
+li{
+  padding: 0 4.5vw 4vw 4.5vw;
+  border-bottom: 0.2vw solid #eee;
+}
+
+li>p{
+  margin-top: 4vw;
+  font-size: 4vw;
+}
+
+li>div p{
+  width: 91vw;
+  height: 1vw;
+  background-color: #eeeeee;
+  border-radius: 1vw;
+  position: relative;
+}
+li>div i{
+  font-size: 4.53vw;
+  font-style: normal;
+  display: inline-block;
+  margin-left: calc(55% - 8%);
+  width: 4vw;
+  padding-right: 10vw;
+  box-sizing: border-box;
+  line-height: 10vw;
+}
+li p span{
+  width: 55%;
+  height: 1vw;
+  background-image: linear-gradient(0deg,
+    #1e64c1 0%,
+    #659feb 100%);
+  border-radius: 1vw;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+div.button{
+  position: fixed;
+  bottom: 0;
+  height: 21.07vw;
+  padding-top: 5.2vw;
+  box-sizing: border-box;
+}
+div.button span{
+  width: 92vw;
+  margin-left: 4vw;
+}

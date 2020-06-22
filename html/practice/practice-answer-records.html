@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <link rel="stylesheet" href="../../css/practice/practice-answer-records.css">
+  <style media="screen">
+
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner"></div>
+    <div class="content" v-cloak>
+      <!-- <p>单选题（共25题）</p> -->
+      <ul>
+        <li :class="[{'error':item.is_correct === 0},{'color-99': !item.is_correct },{'correct':item.is_correct == 1},{'warn':item.is_correct == 2}]" v-for="(item,index) in list" :key="index">
+          {{index + 1}}
+        </li>
+      </ul>
+      <!-- <p>多选题（共25题）</p>
+      <ul style="padding-bottom:16vw">
+        <li class="color-99 error" v-for="(item,index) in list" :key="index">
+          {{item}}
+        </li>
+      </ul> -->
+      <div class="bottom">
+        <span @click="closeTo('practiceQues')">继续做题</span>
+        <span @click="submit">提交试卷</span>
+        <span @click="reStart">重新开始</span>
+      </div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = 'white'
+    // var type = getStorageFn('type') || 'white'
+    setHeader({
+      canBack:true,
+      title:'答题记录',
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var html = $api.dom("html");
+    setBgColor(html,type,'page','page2')
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        id: api.pageParam.test_id || '', // 试卷id
+        useTime: api.pageParam.use_time || '', // 用时/秒
+        list: [],
+        ids: '',
+      },
+      methods:{
+        // 获取答题卡
+        getTestCard(){
+          ajax({
+            url:'getTestCard',
+            params:{
+              token:getStorageFn('token'),
+              test_id:this.id
+            },
+            success:(res)=>{
+              var data = res.data
+              let obj = {};
+              this.list = res.data.reduce((cur,next) => {
+                  obj[next.itembank_id] ? "" : obj[next.itembank_id] = true && cur.push(next);
+                  return cur;
+              },[]) //设置cur默认类型为数组，并且初始值为空的数组
+            },
+            fail:(err)=>{
+              console.log(JSON.stringify(err));
+            }
+          })
+        },
+        // 重新开始
+        reStart(){
+          sends('reStartQues')
+          this.closeTo('practiceQues')
+        },
+        // 提交试卷
+        submit(){
+          this.list.forEach(item=>{
+            if(item.is_correct !== ''){
+              this.ids += item.itembank_id + ','
+            }
+          })
+          ajax({
+            url:'submitTest',
+            params:{
+              token:getStorageFn('token'),
+              test_id:this.id,
+              answer_itembank_ids:this.ids ? this.ids.slice(0,-1) : ' ',
+              use_time:this.useTime
+            },
+            success:(res)=>{
+              var _this = this
+              setTimeout(function(){
+                _this.goW('practiceResult','./practice-result.html',{data:res.data},1)
+              },1000)
+            },
+            fail:(err)=>{
+              console.log(JSON.stringify(err));
+            }
+          })
+        }
+      },
+      mounted(){
+        this.getTestCard()
+      }
+    })
+  }
+</script>
+</html>

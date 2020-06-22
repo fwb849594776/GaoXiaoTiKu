@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    ul{
+      padding: 0 4vw;
+      background: #ffffff;
+    }
+    li{
+      font-size: 3.5vw;
+      line-height: 12vw;
+      border-bottom: 0.2vw solid #f6f6f6;
+      position: relative;
+    }
+    li p{
+      width: 80vw;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    li i.active{
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fd2929;
+      position: absolute;
+      content: '';
+      right: 3vw;
+      top: calc(5vw - 2px)
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner">
+    </div>
+    <ul v-cloak>
+      <li v-for="(item,index) in list" :key="index" @click="toDetail(index,item.id)">
+        <p>{{item.title}}</p>
+        <i :class="{'active':item.is_read == 0}"></i>
+      </li>
+    </ul>
+    <div class="noData" v-if="list.length == 0">暂无通知消息~</div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+
+    setCommonListDark(type)
+    var noData = $api.dom('.noData')
+    setTextColor(noData,type,'color')
+
+    setHeader({
+      canBack: true,
+      title: '查看通知',
+      rType: 'img',
+      rImg: type == 'white' ? '../../image/icons/icon23.png' : '../../image/icons/icon50.png',
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var refreshbgColor = type == 'white' ? '#f6f6f6' : '#000000'
+    var refreshTextColor = type == 'white' ? '#333333' : '#ffffff'
+    refresh(refreshbgColor,refreshTextColor,function(res){
+      app.page = 1
+      app.list = []
+      app.hasmore = true
+      app.SystemNoticelist()
+    })
+
+    listener('scrolltobottom',function(res){
+      if(app.hasmore){
+        app.page ++
+        app.SystemNoticelist()
+      }
+      else{
+        toast('没有更多消息了')
+      }
+    })
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        page: 1,
+        limit: 10,
+        hasmore: true,
+        list: []
+      },
+      methods:{
+        SystemNoticelist(){
+          ajax({
+            url:'SystemNoticelist',
+            params:{
+              token:getStorageFn('token'),
+              page:this.page,
+              limit:this.limit
+            },
+            success:(res)=>{
+              res.data.data.forEach(item=>{
+                this.list.push(item)
+              })
+              if(this.page == res.data.last_page){
+                this.hasmore = false
+              }
+              api.refreshHeaderLoadDone()
+            },
+            fail:(err)=>{
+              console.log(JSON.stringify(err));
+            }
+          })
+        },
+        toDetail(index,id){
+          var _this = this
+          setTimeout(function(){
+            _this.list[index].is_read = 1
+          },500)
+          this.goW('settingNoticeDetail','./setting-notice-detail.html',{id:id},1)
+        }
+      },
+      mounted(){
+        this.SystemNoticelist()
+      }
+    })
+
+  }
+</script>
+</html>

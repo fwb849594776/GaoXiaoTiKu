@@ -1,0 +1,121 @@
+html,body{
+  background: transparent;
+  width: 100%;
+  height: 100%;
+}
+[v-cloak]{
+  display: none;
+}
+div{
+  box-sizing: border-box;
+}
+.header{
+  height: 17vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4vw;
+  color: #f4f9ff;
+  font-size: 4.5vw;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 2000;
+}
+.header img{
+  height: 5vw;
+}
+.seat2{
+		height: 8vw;
+		border-radius: 0 0 50% 50%;
+}
+
+div.button{
+  margin-top: 7.07vw;
+}
+div.button span{
+  width: 69.2vw;
+  line-height: 9.33vw;
+  background-image: linear-gradient(0deg,
+    #1e64c1 0%,
+    #4a8fea 100%);
+  border-radius: 4.67vw;
+  font-size: 4vw;
+  color: #fff;
+  text-align: center;
+  margin-left: 15.33vw;
+}
+
+
+.mint-popup{
+  border-radius: 2vw;
+  overflow: hidden;
+}
+
+#popup{
+  width: 72.53vw;
+  text-align: center;
+  border-radius: 2vw;
+  overflow: hidden;
+  position: relative;
+}
+
+#popup>img{
+  width: 3.6vw;
+  height: 3.6vw;
+  position: absolute;
+  top: 3vw;
+  right: 3vw;
+  object-fit: cover;
+}
+
+#popup .popuptitle{
+  line-height: 28.8vw!important;
+  font-size: 4.3vw;
+}
+
+#popup div.btns{
+  display: flex;
+  justify-content: space-between;
+  border-top: 2vw solid #f6f6f6;
+  font-size: 4vw;
+}
+
+#popup div.btns span{
+  width: 50%;
+  line-height: 12vw;
+}
+
+input{
+  outline: none;
+}
+
+.bg-color{
+  background: #f6f6f6
+}
+.normal-color{
+  color: #333333
+}
+.dark-color{
+  color: #ffffff
+}
+.color-99{
+  color: #999999
+}
+.color-77{
+  color: #777777
+}
+.color-1e64c1{
+  color: #1e64c1!important
+}
+.noData{
+  line-height: 12vw;
+  color: #999;
+  font-size: 3.5vw;
+  text-align: center;
+}
+@keyframes myfirst
+{
+    from {opacity: 0;}
+    to {opacity: 1;}
+}

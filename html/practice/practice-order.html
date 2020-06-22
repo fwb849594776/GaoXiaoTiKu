@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/mint.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <link rel="stylesheet" href="../../css/subjectList.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    img{
+      height: 2.67vw
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner"></div>
+    <ul v-cloak>
+      <li  @click="toChild(item.id,item.taxonomy,item.children)" v-for="(item,index) in list" :key="index">
+        <div class="list-left">
+          <p class="title normal-color">{{item.title}}</p>
+          <p v-if="item.taxonomy == 'test'"><span class="color-77">已答：</span><span class="color-1e64c1">{{item.answer_record_count}}/{{item.itembank_count}}</span></p>
+        </div>
+        <div>
+          <img src="../../image/icons/icon29.png" alt="">
+        </div>
+      </li>
+      <mt-popup
+        v-model="popupVisible">
+        <div id="popup">
+          <img src="../../image/icons/close.png" alt="" @click="close">
+          <p class="popuptitle">是否继续上次的练习？</p>
+          <div class="btns normal-color">
+            <span @click="toPracticeQues">继续练习</span>
+            <span @click="toPracticeQues">重新练习</span>
+          </div>
+        </div>
+      </mt-popup>
+    </ul>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/mint.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = 'white'
+    // var type = getStorageFn('type') || 'white'
+    setHeader({
+      canBack:true,
+      title:"顺序练习",
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var html = $api.dom('html')
+    setBgColor(html,type,'page')
+
+    refresh('#f6f6f6','#333333',function(res){
+      api.refreshHeaderLoadDone()
+    })
+
+    listener('scrolltobottom',function(res){
+      console.log(JSON.stringify(res));
+    })
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        list:api.pageParam.list || [],
+        index:0,
+        popupVisible:false
+      },
+      methods:{
+        close(){
+          this.popupVisible = false
+        },
+        toPracticeQues(){
+          this.popupVisible = false
+          this.goW('practiceQues','./practice-ques.html',{id:this.id},1)
+        },
+        // 打开课程下一级
+        toChild(id,taxonomy,child){
+          this.id = id
+          if(child.length == 0){
+            if(taxonomy == 'test'){
+              // 有做题记录
+              this.popupVisible = true
+              return
+              // 无做题记录
+              this.goW('practiceQues','./practice-ques.html',{id:this.id},1)
+            }
+            return
+          }
+          else{
+            var winName = 'practiceOrder' + this.index
+            this.goW(winName,'./practice-order.html',{list:child},1)
+            this.index ++
+          }
+        }
+      },
+      mounted(){
+      }
+    })
+  }
+</script>
+</html>

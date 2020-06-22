@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <link rel="stylesheet" href="../../css/mint.css">
+  <link rel="stylesheet" href="../../css/search/search.css">
+  <style media="screen">
+    .title,ul{
+      padding: 0 3.87vw;
+    }
+    ul{
+      padding-bottom: 4vw
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div class="header">
+      <span>查找</span>
+    </div>
+    <div class="content">
+        <div class="search-box">
+          <div class="search-inner">
+            <i @click="search(value)"></i>
+            <input type="text" name="" v-model="value" placeholder="输入标题寻找">
+          </div>
+        </div>
+        <div class="content-inner">
+          <div class="hot-list">
+            <p class="title normal-color">热门搜索</p>
+            <ul>
+              <li class="normal-color hotColor" v-for="(item,index) in hotData" :key="index" @click="search(item)">{{item}}</li>
+            </ul>
+          </div>
+          <div class="search-list">
+            <p class="title normal-color"><span>搜索历史</span><span class="del" @click="delAll">清空</span></p>
+            <ul class="search-ul" v-if="historyList.length > 0">
+              <li class="normal-color historys" v-for="(item,index) in historyList" :key="index" @click="search(item)">{{item}}</li>
+            </ul>
+          </div>
+        </div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/mint.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+
+    var [header, content, searchBox, searchInner, normalColor, ul, hotColors, lis] = [$api.dom('.header'), $api.dom('.content'), $api.dom('.search-box'), $api.dom('.search-inner'), $api.domAll('.normal-color'), $api.dom('.search-ul'), $api.domAll('.hotColor'),  $api.domAll('.historys')]
+
+    // 沉浸式导航
+    $api.fixStatusBar(header);
+
+    // 设置内容距离顶部高度
+    var headerH = $api.cssVal(header,'height');
+    $api.css(content,'padding-top:' + headerH)
+
+    // 是否开启夜间模式
+    var type = getStorageFn('type') || 'white'
+
+    // 根据主题模式设置相应元素背景色
+    var bgColor = type == 'white' ? themes.bgNormalColor : themes.bgDarkColor
+    setBgColor(header, type)
+    setBgColor(searchBox, type)
+    setTextColor(searchInner, type)
+    setTextColor(ul, type)
+    normalColor.forEach(item=>{
+      setTextColor(item, type, 'color')
+    })
+    hotColors.forEach(item=>{
+      setTextColor(item, type)
+    })
+    lis.forEach(item=>{
+      setBorderColor(item, type)
+    })
+
+    listener('closeDialog',function(res){
+      closeF('dialogFrame')
+    })
+
+    // 监听下拉刷新
+    var refreshbgColor = type == 'white' ? '#1e64c1' : '#000000'
+    refresh(refreshbgColor,'#ffffff',function(res){
+      app.getSearchList()
+    })
+
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        value:'',
+        hotData:[],
+        historyList:[]
+      },
+      methods:{
+        search(key){
+          if(!getGlobalDataFn('course_id')){
+            toast('请先选择科目')
+            return
+          }
+          if(!key){
+            toast('请输入标题')
+            return
+          }
+          var historyList = getStorageFn('historyList')
+          var data = historyList ? historyList : []
+          data.unshift(key)
+          if(historyList){
+            data = Array.from(new Set(data))
+          }
+          setStorageFn([{'key':'historyList','value':data}])
+          this.goW('searchList','./search-list.html',{keywords:key},1)
+          var _this = this
+          setTimeout(function(){
+            _this.getHistory()
+          },800)
+        },
+        // 清空搜索历史
+        delAll(){
+          var _this = this
+          api.confirm({
+              title: '',
+              msg: '确认删除全部历史记录',
+              buttons: ['确定', '取消']
+          }, function(ret, err) {
+              var index = ret.buttonIndex;
+              if(index == 1){
+                setStorageFn([{'key':'historyList','value':[]}])
+                _this.getHistory()
+              }
+          });
+        },
+        // 获取搜索记录
+        getSearchList(){
+          ajax({
+            url:'getHotSearch',
+            params:{},
+            success:(res)=>{
+              this.hotData = res.data
+              api.refreshHeaderLoadDone()
+            },
+            fail:(err)=>{
+              console.log(JSON.stringify(err));
+            }
+          })
+        },
+        // 获取搜索历史
+        getHistory(){
+          this.historyList = getStorageFn('historyList') ? getStorageFn('historyList') : []
+        }
+      },
+      mounted(){
+        this.getSearchList()
+        this.getHistory()
+      }
+    })
+  }
+</script>
+</html>

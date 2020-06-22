@@ -1,0 +1,34 @@
+.headerInner{
+  height: 12vw;
+}
+div.textBox{
+  position: relative;
+  font-size: 3.73vw;
+  padding-bottom: 10vw;
+  background: #ffffff;
+  margin-top: 2.67vw;
+}
+textarea{
+  padding: 4.13vw;
+  line-height: 6vw;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+}
+i{
+  position: absolute;
+  bottom: 0;
+  right: 4.13vw;
+  line-height: 8vw;
+  font-style: normal;
+  color: #999;
+}
+div.button{
+  position: fixed;
+  bottom: 7.6vw;
+}
+div.button span{
+  width: 92vw;
+  margin-left: 4vw;
+}

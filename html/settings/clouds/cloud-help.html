@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../../css/api.css">
+  <link rel="stylesheet" href="../../../css/common.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    .content{
+      width: 92vw;
+      margin-top: 4vw;
+      margin: 0 auto;
+      text-align: justify;
+      line-height: 6vw;
+      font-size: 4.53vw;
+      padding-top: 4vw
+    }
+
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner">
+
+    </div>
+    <div class="content normal-color">
+      <p v-html="content"></p>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+
+    var [html, content] = [$api.dom("html"), $api.dom(".content")];
+    setBgColor(html,type,'page','fpage')
+    $api.css(content, 'color:' + (type == 'white' ? '#333333' : '#ffffff'))
+
+    setHeader({
+      canBack: true,
+      title: '查看帮助',
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        content:''
+      },
+      methods:{
+        getHelpInfo(){
+          ajax({
+            url:'getHelpInfo',
+            params:{},
+            success:(res)=>{
+              this.content = res.data.content
+            },
+            fail:(err)=>{
+              console.log(JSON.stringify(err));
+            }
+          })
+        }
+      },
+      mounted(){
+        this.getHelpInfo()
+      }
+    })
+
+  }
+</script>
+</html>

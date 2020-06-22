@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    .content{
+      padding: 4vw;
+      font-size: 4vw;
+      color: #333;
+      line-height: 6vw;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner"></div>
+    <div class="content">
+      间哦积分附近啪司法局盘激发迫降发泡剂发票搜集发屁估计怕的价格
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = 'white'
+    // var type = getStorageFn('type') || 'white'
+    setHeader({
+      canBack:true,
+      title:"讲义详情",
+      rType:"text",
+      rText:'我要激活',
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    var html = $api.dom('html')
+    setBgColor(html,type,'page','settingNoteDetail')
+
+    // 监听标题事件
+    api.addEventListener({
+        name: 'rightClick'
+    }, function(ret, err){
+        app.goW('settingActivation','./setting-activation.html',{},1)
+    });
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+      },
+      methods:{
+      },
+      mounted(){}
+    })
+  }
+</script>
+</html>

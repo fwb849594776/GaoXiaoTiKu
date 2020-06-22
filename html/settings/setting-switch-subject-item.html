@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <link rel="stylesheet" href="../../css/subjectList.css">
+  <link rel="stylesheet" href="../../css/mint.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    img{
+      height: 2.67vw
+    }
+    p.title{
+      display: flex;
+      align-items: center;
+    }
+    p.title span{
+      font-size: 3vw;
+      line-height: 4vw;
+      margin-left: 2vw;
+      padding: 0 1.2vw;
+    }
+
+    p.title span.use{
+      background-color: rgba(254,188,42,0.15);
+      color: #febc2a;
+    }
+
+    p.title span.buy{
+      background-color: rgba(30,100,193,0.15);
+      color: #1e64c1;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner"></div>
+    <ul v-cloak>
+      <li @touchstart="start(item)" @touchend="end" v-for="(item,index) in list.children" :key="index">
+        <div class="list-left">
+          <!-- （ 0=可试用，1=待激活，2=已购买，3=已过期） -->
+          <p class="title normal-color">{{item.title}}<span :class="['use',{'buy' : item.buy_status == 1}]">{{item.buy_status == 0 ? '可试用' : (item.buy_status == 1 ? '待激活' : (item.buy_status == 2 ? '已购买' : '已过期'))}}</span></p>
+          <p><span class="color-99">版本：{{item.version}}（长按三秒可重新下载）</span></p>
+        </div>
+        <div>
+          <img src="../../image/icons/icon29.png" alt="">
+        </div>
+      </li>
+    </ul>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/mint.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+
+    setHeader({
+      canBack:true,
+      title:"切换科目",
+      // rType:"text",
+      // rText:"我要激活",
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    setCommonListDark(type)
+
+    // 监听标题事件
+    listener('rightClick',function () {
+      app.goW('settingActivation','./setting-activation.html',{},1)
+    })
+
+    var st
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        time:0,
+        list: api.pageParam.data || {},
+      },
+      methods:{
+        // 长按事件
+        start(obj){
+          if(obj.buy_status == 0){
+            setGlobalDataFn('exam_time',this.list.exam_time)
+            setStorageFn([{key: 'exam_time', value: this.list.exam_time}])
+            this.goW('settingSwitchSubjectItemItem','./setting-switch-subject-item-item.html',{title:obj.title,subject_id:obj.id},1)
+          }
+          var _this = this
+          st = setInterval(function(){
+            _this.time += 1
+            if(_this.time == 3){
+              _this.time = 0
+              clearInterval(st)
+            }
+          },1000)
+        },
+        // 结束长按
+        end(){
+          this.time = 0
+          clearInterval(st)
+        }
+      },
+      mounted(){
+      }
+    })
+  }
+</script>
+</html>

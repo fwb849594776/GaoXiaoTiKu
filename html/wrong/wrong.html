@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../../css/api.css">
+    <link rel="stylesheet" href="../../css/common.css">
+    <style media="screen">
+        .seat1 {
+            height: 12vw
+        }
+
+        ul {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: -15vw;
+        }
+
+        li {
+            width: 46%;
+            background-color: #ffffff;
+            margin: 0 0 2.5vw 2.5vw;
+            height: 29.33vw;
+            border-radius: 2vw;
+            padding: 5.6vw 6vw;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        li img{
+          height: 17.2vw;
+          position: absolute;
+          bottom: -0.2vw;
+          right: 0;
+        }
+
+        li.child-1 img{
+          height: 20.67vw;
+          right: -7vw;
+        }
+
+        li.child-2 img{
+          height: 22vw;
+          right: -2vw;
+        }
+
+        li.child-3 img{
+          height: 18.67vw;
+          bottom: 0
+        }
+
+        p {
+            font-size: 4vw;
+            line-height: 6vw;
+        }
+
+        p.total {
+            font-size: 4.8vw;
+            color: #1e64c1;
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <div class="header">
+            <img src="../../image/icons/menu.png" alt="" @click="goW('switchSubject','../settings/setting-switch-subject.html',{},1)">
+            <span>{{course_title}}</span>
+            <img src="../../image/icons/setting.png" alt="" @click="goW('setting','../settings/setting.html',{},1)">
+        </div>
+        <div class="content">
+        </div>
+        <div class="seat1"></div>
+        <div class="seat2"></div>
+        <ul>
+            <li class="child-1" @click="jump('wrongList','./wrong-list.html',{type:1},1)">
+                <p class="normal-color">章节错题</p>
+                <p class="total">{{data.zj_error_count}}</p>
+                <img src="../../image/icons/icon11.png" alt="">
+            </li>
+            <li  class="child-2" @click="jump('wrongList','./wrong-list.html',{type:2},1)">
+                <p class="normal-color">试卷错题</p>
+                <p class="total">{{data.pt_error_count}}</p>
+                <img src="../../image/icons/icon12.png" alt="">
+            </li>
+            <li  class="child-3" @click="jump('wrongList','./wrong-list.html',{type:3},1)">
+                <p class="normal-color">收藏错题</p>
+                <p class="total">{{data.collect_error_count}}</p>
+                <img src="../../image/icons/icon13.png" alt="">
+            </li>
+            <li @click="jump('wrongList','./wrong-list.html',{type:4},1)">
+                <p class="normal-color">所有错题</p>
+                <p class="total">{{data.all_error_count}}</p>
+                <img src="../../image/icons/icon14.png" alt="">
+            </li>
+            <li @click="jump('wrongList','./wrong-list.html',{type:5},1)">
+                <p class="normal-color">二次以上</p>
+                <p class="total">{{data.two_error_count}}</p>
+                <img src="../../image/icons/icon14.png" alt="">
+            </li>
+            <li @click="jump('wrongList','./wrong-list.html',{type:6},1)">
+                <p class="normal-color">四次以上</p>
+                <p class="total">{{data.four_error_count}}</p>
+                <img src="../../image/icons/icon14.png" alt="">
+            </li>
+            <li @click="jump('wrongList','./wrong-list.html',{type:7},1)">
+                <p class="normal-color">六次以上</p>
+                <p class="total">{{data.six_error_count}}</p>
+                <img src="../../image/icons/icon14.png" alt="">
+            </li>
+            <li @click="deleteFn">
+                <p class="normal-color">删除所有</p>
+                <p class="total">{{data.all_error_count}}</p>
+                <img src="../../image/icons/icon14.png" alt="">
+            </li>
+        </ul>
+    </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        // 是否开启夜间模式
+        var type = getStorageFn('type') || 'white'
+        var [header, content, seat1, seat2, normalColor, list] = [$api.dom('.header'), $api.dom('.content'), $api.dom('.seat1'), $api.dom('.seat2'), $api.domAll('.normal-color'), $api.domAll('li')]
+        setBgColor(header, type)
+        setBgColor(content, type)
+        setBgColor(seat1, type)
+        setBgColor(seat2, type)
+        list.forEach(item=>{
+          setTextColor(item, type)
+        })
+        normalColor.forEach(item=>{
+          setTextColor(item, type)
+        })
+        $api.fixStatusBar(header);
+        var headerH = $api.cssVal(header, 'height');
+        $api.css(content, 'padding-top:' + headerH)
+
+        // 监听课程切换
+        listener('setCourse',function(res){
+          app.getCourseInfo()
+        })
+
+        listener('login',function(res){
+          app.getCourseInfo()
+          app.answerErrorRecordStatistics()
+        })
+
+        // 监听下拉刷新
+        var refreshbgColor = type == 'white' ? '#1e64c1' : '#000000'
+        refresh(refreshbgColor,'#ffffff',function(res){
+          app.getCourseInfo()
+          app.answerErrorRecordStatistics()
+        })
+
+        var app = new Vue({
+            el: "#app",
+            data: {
+              course_title: '请选择科目',
+              data:{
+                    "zj_error_count":0,
+                    "pt_error_count":0,
+                    "collect_error_count":0,
+                    "all_error_count":0,
+                    "two_error_count":0,
+                    "four_error_count":0,
+                    "six_error_count":0
+                }
+            },
+            methods: {
+              deleteFn(){
+                if(!getGlobalDataFn('course_id')){
+                  toast('请先选择科目!')
+                  return
+                }
+                var _this = this
+                api.confirm({
+                    title: '确定删除所有错题吗？',
+                    msg: '一键删除所有错题后将不能恢复',
+                    buttons: ['确定', '取消']
+                }, function(ret, err){
+                  var buttonIndex = ret.buttonIndex
+                  if(buttonIndex == 1){
+                    _this.deleteUserAllAnswerRecordTypeError()
+                  }
+                });
+
+              },
+              // 获取课程详情
+              getCourseInfo(){
+                if(!getGlobalDataFn('course_id')){
+                  api.refreshHeaderLoadDone()
+                  return
+                }
+                ajax({
+                  url: 'getCourseInfo',
+                  params: {
+                    token: getStorageFn('token'),
+                    course_id: getGlobalDataFn('course_id')
+                  },
+                  success:(res) => {
+                    api.refreshHeaderLoadDone()
+                    this.course_title = res.data.course_info.title
+                  },
+                  fail:(err)=>{
+                    console.log(JSON.stringify(err))
+                  }
+                })
+              },
+              // 错题统计
+              answerErrorRecordStatistics(){
+                if(!getGlobalDataFn('course_id')){
+                  api.refreshHeaderLoadDone()
+                  return
+                }
+                ajax({
+                  url:'answerErrorRecordStatistics',
+                  params:{
+                    token: getStorageFn('token'),
+                    course_id: getGlobalDataFn('course_id')
+                  },
+                  success:(res)=>{
+                    api.refreshHeaderLoadDone()
+                    this.data = res.data
+                  },
+                  fail:(err)=>{
+                    console.log(JSON.stringify(err))
+                  }
+                })
+              },
+              // 页面跳转
+              jump(name,url,params,auth){
+                if(!getGlobalDataFn('course_id')){
+                  toast('请先选择科目')
+                  return
+                }
+                this.goW(name,url,params,auth)
+              },
+              // 删除所有错题
+              deleteUserAllAnswerRecordTypeError(){
+                ajax({
+                  url:'deleteUserAllAnswerRecordTypeError',
+                  params:{
+                    token: getStorageFn('token'),
+                    course_id: getGlobalDataFn('course_id')
+                  },
+                  success:(res)=>{
+                    toast('删除成功')
+                    this.answerErrorRecordStatistics()
+                  },
+                  fail:(err)=>{
+                    console.log(JSON.stringify(err));
+                  }
+                })
+              },
+            },
+            mounted() {
+              this.getCourseInfo()
+              this.answerErrorRecordStatistics()
+            }
+        })
+    }
+</script>
+
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../../css/api.css">
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/mint.css">
+    <link rel="stylesheet" href="../../css/practice/practice-test-question.css">
+    <style media="screen">
+        html,
+        body {
+            font-size: 100px;
+        }
+
+        .headerInner {
+            height: 12vw;
+        }
+
+        #popup div.btns span {
+            width: 100%;
+        }
+
+        #popup {
+            width: 64.93vw;
+            padding-top: 1.87vw;
+            background: rgba(0, 0, 0, 0)
+        }
+
+        div.popup-inner {
+            width: 61.6vw;
+            position: relative;
+            background: #fff;
+            padding: 2vw 0 2.47vw 0;
+            border-radius: 2vw;
+        }
+
+        div.popup-inner>img {
+            width: 6.93vw!important;
+            height: 6.93vw!important;
+            object-fit: cover;
+            position: absolute;
+            top: -1.87vw!important;
+            right: -3.33vw!important;
+        }
+
+        .popup-inner>div img {
+            width: 57.33vw;
+            height: 26.8vw;
+            object-fit: cover;
+        }
+
+        .popup-inner p {
+            font-size: 3.73vw;
+            color: #333;
+            line-height: 12vw;
+        }
+
+        .popup-inner p.btn {
+            width: 26.67vw;
+            line-height: 7.33vw;
+            border-radius: 3.67vw;
+            border: solid 0.13vw #2066c2;
+            margin: 3vw auto;
+            color: #2066c2
+        }
+
+        .btn-active {
+            background-image: none!important;
+            color: #1e64c1!important;
+            border: 0.2vw solid #1e64c1;
+        }
+
+        .normal-dark-color {
+            color: #fff!important;
+        }
+
+        .line-dark-color {
+            background-color: rgba(0, 0, 0, 0)
+        }
+
+        .titleText {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .bottom{
+          position: fixed;
+          bottom: 0;
+          background: #fff;
+          z-index: 2;
+        }
+
+        .button{
+          margin-bottom: 17.33vw
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <mt-popup v-model="popupVisible">
+            <div id="popup">
+                <p class="popuptitle">{{popupVisibleMsg}}</p>
+                <div class="btns normal-color">
+                    <span @click="close">我知道了</span>
+                </div>
+            </div>
+        </mt-popup>
+        <div class="headerInner"></div>
+        <div class="content size">
+            <!-- 标题 -->
+            <div :class="['title','normal-color',{'normal-dark-color': type == 'dark'}]">
+                <span>第{{current_page}}题 共{{total}}题</span>
+            </div>
+            <!-- 分割线 -->
+            <div :class="['line','bg-color',{'line-dark-color':type == 'dark'}]"></div>
+            <!-- 题目 -->
+            <div :class="['ques-box','normal-color',{'normal-dark-color':type == 'dark'}]">
+                <p><span class="ques-title">{{data.itembank_type == 'onechoice' ? '单选' : (data.itembank_type == 'manychoice' ? '多选' : (data.itembank_type == 'fill_in' ? '填空题' : (data.itembank_type == 'qa' ? '问答题' : '判断题')))}}</span><span v-html="data.itembank_title"></span></p>
+                <!-- 判断 -->
+                <ul class="radio-box" v-if="data.itembank_type == 'judge'">
+                    <li class="item" @click="answer(item.answer)" v-for="(item,index) in options" :key="index">
+                        <span :class="['option', 'normal-color', {'option-active' : item.select == 1}, {'option-error-active' : item.select == 2}]">{{item.answer == 1 ? '√' : '×'}}</span>
+                        <p>{{item.answer == 1 ? '正确' : '错误'}}</p>
+                        <i v-if="item.select == 1"><img src="../../image/icons/icon34.png" alt=""></i>
+                        <i v-if="item.select == 2" class="error"><img src="../../image/icons/icon40.png" alt=""></i>
+                    </li>
+                </ul>
+                <!-- 单选/多选 -->
+                <ul class="radio-box" v-if="data.itembank_type == 'onechoice' ||data.itembank_type == 'manychoice' ">
+                    <li class="item" v-for="(item,index) in options" :key="index" @click="answer(item.answer)">
+                        <span :class="['option', 'normal-color', {'option-active' : item.select == 1}, {'option-error-active' : item.select == 2}]">{{item.answer}}</span>
+                        <p v-html="item.value"></p>
+                        <i v-if="item.select == 1"><img src="../../image/icons/icon34.png" alt=""></i>
+                        <i v-if="item.select == 2" class="error"><img src="../../image/icons/icon40.png" alt=""></i>
+                    </li>
+                </ul>
+                <!-- 填空题 -->
+                <ul class="completion-box" v-if="data.itembank_type == 'fill_in'">
+                    <li class="item" v-for="(item,index) in options" :key="index">
+                        <span class="option normal-color">{{index + 1}}</span>
+                        <p>
+                            <input type="text" name="" v-model="item.answer" placeholder="请输入您的答案...">
+                        </p>
+                    </li>
+                </ul>
+                <!-- 问答题 -->
+                <div class="essay" v-if="data.itembank_type == 'qa'">
+                    <textarea name="name" placeholder="请输入您的答案..." v-for="(item,index) in options" v-model="item.answer"></textarea>
+                </div>
+            </div>
+            <!-- 底部 -->
+            <div class="footer">
+              <!-- <div class="top top-active"> -->
+                <div class="top">
+                    <span class="color-1e64c1 darkbtn" @click="prev">上一题</span>
+                    <span class="color-1e64c1 darkbtn" @click="answers">提交</span>
+                    <span class="color-1e64c1 darkbtn" @click="next">下一题</span>
+                </div>
+                <div class="bottom">
+                    <div class="funs">
+                        <span class="color-99"><img src="../../image/icons/icon35.png" alt="">{{data.correct_times}}/{{data.correct_times + data.error_times}}</span>
+                        <span class="color-99"><img src="../../image/icons/icon36.png" alt="">{{data.correct_times}}</span>
+                        <span class="color-99"><img src="../../image/icons/icon37.png" alt="">{{data.error_times}}</span>
+                        <span class="color-99" v-if="data.has_collect == 1" @click="collect('cancel')"><img src="../../image/icons/icon44.png" alt="">已收藏</span>
+                        <span class="color-99" v-else @click="collect('add')"><img src="../../image/icons/icon38.png" alt="">收藏</span>
+                    </div>
+                    <div class="btn" v-if="data.has_error_record == 0" @click="error('add')">加入错题</div>
+                    <div class="btn btn-active" v-else @click="error('del')">移除错题</div>
+                </div>
+                <div class="bottom2">
+                    <!-- 分割线 -->
+                    <div :class="['line','bg-color','line2',{'line-dark-color':type == 'dark'}]"></div>
+                    <p :class="['normal-color',{'normal-dark-color':type == 'dark'}]"><span class="bottom-title">试题详解</span><span class="error color-99" @click="goW('practiceErrorSubmit','../practice/practice-errorSubmit.html',{target_id:subject_id},1)">报错</span></p>
+                    <!-- 分割线 -->
+                    <div :class="['line','bg-color','line3',{'line-dark-color':type == 'dark'}]"></div>
+                    <div>
+                        <p class="color-1e64c1">答案：{{data.itembank_type == 'judge' ? (data.answer == 0 ? '错误' : '正确') : answerText}}</p>
+                        <!-- <div v-html="data.itembank_info.answer_key" :class="['content','normal-color',{'normal-dark-color':type == 'dark'}]">
+                        </div> -->
+                    </div>
+                    <!-- 分割线 -->
+                    <div :class="['line','bg-color','line2',{'line-dark-color':type == 'dark'}]"></div>
+                    <p :class="['normal-color',{'normal-dark-color':type == 'dark'}]"><span class="bottom-title">考试笔记</span></p>
+                    <!-- 分割线 -->
+                    <div :class="['line','bg-color','line3',{'line-dark-color':type == 'dark'}]"></div>
+                    <ul :class="['normal-color',{'normal-dark-color':type == 'dark'}]">
+                        <li v-for="(item,index) in noteList" :key="index">
+                            <p>2020-10-01</p>
+                            <div class="content">
+                                {{item.content}}
+                            </div>
+                        </li>
+                        <div class="noData size" v-if="noteList.length == 0">您还未添加笔记~</div>
+                    </ul>
+                    <div class="button">
+                        <span @click="goW('practiceAddNote','../practice/practice-addNote.html',{target_id:subject_id},1)">添加笔记</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/mint.js"></script>
+<script type="text/javascript" src="../../script/rem.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        // 自定义夜间模式
+        var type = getStorageFn('type') || 'white'
+        setHeader({
+            canBack: true,
+            title: '错题明细',
+            bgType: type == 'white' ? false : true,
+        }, type)
+
+        var [html, line, content, btns, bottom, inputs, textArea] = [$api.dom('html'), $api.dom('.line'), $api.dom('.size'), $api.domAll('.darkbtn'), $api.dom('.bottom'), $api.domAll('input'), $api.dom('textarea')]
+        setBgColor(html, type, 'page', 'page2')
+        setTextColor(bottom, type)
+        setTextColor(textArea, type)
+        setBorderColor(bottom, type)
+        btns.forEach(item=>{
+          setBorderColor(item,type)
+        })
+        inputs.forEach(item=>{
+          setTextColor(item,type,'color')
+        })
+            // 用户持久不操作
+
+        // 设置字体大小
+        var size = getStorageFn('size') || 26
+        $api.css(content, 'font-size:' + (size / 100) + 'rem')
+
+        // 自定义定时器
+        var st;
+        var st2;
+
+        var app = new Vue({
+            el: "#app",
+            data: {
+                id: api.pageParam.id || '', // 试卷id
+                subject_id: '', // 题目id
+                noteList: [], // 笔记列表
+                type: type, // 自定义夜间模式
+                // // 弹框
+                popupVisible: false,
+                popupVisibleMsg: "加入错题成功，快去查看吧！",
+                // titleActive: 0,
+                // showDetail: false,
+                total: '', // 总题数
+                per_page: '',
+                current_page: 1, // 当前题数
+                last_page: '',
+                data: {
+                    id: '', // 错题记录ID
+                    test_id: '', // 试卷ID
+                    itembank_id: '', // 题目ID
+                    itembank_type: '', // 题目类型
+                    itembank_title: '', // 题目标题
+                    values: [], // 选项
+                    answer: [],
+                    score: 0,
+                    get_score: 0,
+                    input_answer: [],
+                    is_correct: 0,
+                    is_answered: 0,
+                    answer_times: 0, // 答题次数
+                    correct_times: 0, // 正确次数
+                    error_times: 0, // 错误次数
+                    correct_times_after_error: 0,
+                    has_error_record: 0, // 0未加入错题，1已加入错题
+                    has_collect: 0 // 0未收藏，1已收藏
+                }, // 试题详情
+                answerText: '',
+                options: [], // 选项显示状态
+                myAnswers:[],
+                // flag: false, // 试题请求成功
+            },
+            methods: {
+                // 时间监听
+                listeners() {
+                    var _this = this
+
+                    // 监听左滑
+                    listener('swipeleft', function(res) {
+                            _this.next()
+                        })
+                        // 监听右滑
+                    listener('swiperight', function(res) {
+                            _this.prev()
+                        })
+                        // 监听添加笔记
+                    listener('addNote', function() {
+                        _this.getNoteList()
+                    })
+                },
+                // 获取试题
+                getItembankInfo() {
+                      ajax({
+                        url: 'getAnswerRecordTypeErrorList',
+                        params: {
+                            token: getStorageFn('token'),
+                            test_id: this.id,
+                            page: this.current_page
+                        },
+                        success: (res) => {
+                            this.total = res.data.total
+                            this.per_page = res.data.per_page
+                            this.current_page = res.data.current_page
+                            this.last_page = res.data.last_page
+                                // this.flag = true
+                                // this.showDetail = false
+                                // // 获取题目id，并获取笔记
+                            var data = res.data.data[0]
+                            this.subject_id = data.itembank_id
+                            this.getNoteList()
+                            this.myAnswers = []
+                            if (data.answer) {
+                                data.answer = data.answer.split(',')
+                            }
+                            if (data.input_answer) {
+                                data.input_answer = data.input_answer.split(',')
+                                if(data.itembank_type != 'judge' && data.itembank_type != 'onechoice'){
+                                  data.input_answer.forEach(item=>{
+                                    this.myAnswers.push(item)
+                                  })
+                                  data.answer.forEach(item=>{
+                                    this.myAnswers.push(item)
+                                  })
+                                  this.myAnswers = Array.from(new Set(this.myAnswers))
+                                }
+                            }
+                            if (data.itembank_type != 'judge') {
+                                var answer = ''
+                                data.answer.forEach(item => {
+                                    answer += item + ' '
+                                })
+                                this.answerText = answer
+                            }
+                            this.data = data
+                            this.options = []
+                            if (this.data.itembank_type == 'judge') {
+                                // 通过option数组控制选项的选中状态
+                                this.options = [{
+                                    answer: 1,
+                                    select: 0, // 0 不显示选择状态  1 显示正确选项  2 显示错误选项
+                                }, {
+                                    answer: 0,
+                                    select: 0,
+                                }]
+                            } else if (this.data.itembank_type == 'onechoice' || this.data.itembank_type == 'manychoice') {
+                                this.data.values.forEach(item => {
+                                    this.options.push({
+                                        answer: item.key,
+                                        value: item.value,
+                                        select: 0,
+                                    })
+                                })
+                            } else {
+                                this.data.answer.forEach((item,index) => {
+                                    this.options.push({
+                                        answer: this.data.input_answer[index] ? this.data.input_answer[index] : '',
+                                    })
+                                })
+                            }
+                            // 判断用户选择的选项
+                            if (this.data.input_answer) {
+                                if (this.data.itembank_type == 'onechoice' || this.data.itembank_type == 'manychoice' || this.data.itembank_type == 'judge') {
+                                    this.data.answer.forEach(item => {
+                                        // this.data.input_answer.forEach(item => {
+                                        this.options.forEach(items => {
+                                            if (items.answer == item) {
+                                                items.select = 1
+                                            }
+                                        })
+                                    })
+                                    this.data.input_answer.forEach(item => {
+                                        var flag = this.data.answer.includes(item)
+                                        if (!flag) {
+                                            this.options.forEach(items => {
+                                                if (items.answer == item) {
+                                                    items.select = 2
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
+                            }
+                        },
+                        fail: (err) => {
+                            console.log(JSON.stringify(err));
+                        }
+                    })
+                },
+                // 获取笔记列表
+                getNoteList() {
+                    ajax({
+                        url: 'getNoteList',
+                        params: {
+                            token: getStorageFn('token'),
+                            target_type: 'itembank',
+                            target_id: this.subject_id
+                        },
+                        success: (res) => {
+                            this.noteList = res.data.data
+                        },
+                        fail: (err) => {
+                            console.log(JSON.stringify(err));
+                        }
+                    })
+                },
+                // 下一题
+                next() {
+                    if (this.current_page == this.last_page) {
+                        return
+                    }
+                    this.current_page++
+                        this.getItembankInfo()
+                },
+                // 上一题
+                prev() {
+                    if (this.current_page == 1) {
+                        return
+                    }
+                    this.current_page--
+                        this.getItembankInfo()
+                },
+                // [取消]收藏
+                collect(type){
+                  if(type == 'add'){
+                    this.popupVisibleMsg = "恭喜您收藏成功！"
+                  }
+                  else{
+                    this.popupVisibleMsg = "已取消收藏！"
+                  }
+                  ajax({
+                    url:'handleCollect',
+                    params:{
+                      token: getStorageFn('token'),
+                      target_type: 'itembank',
+                      handle_type: type,
+                      target_id: this.data.itembank_id
+                    },
+                    success:(res)=>{
+                      this.popupVisible = true
+                      if(type == 'add'){
+                        this.data.has_collect = 1
+                      }
+                      else{
+                        this.data.has_collect = 0
+                      }
+                    },
+                    fail:(err)=>{
+                      console.log(JSON.stringify(err));
+                    }
+                  })
+                },
+                // 加入[移除]错题
+                error(type){
+                  if(type == 'del'){
+                    this.popupVisibleMsg = "错题已移除！"
+                  }
+                  else{
+                    this.popupVisibleMsg = "加入错题成功，快去查看吧！"
+                  }
+                  ajax({
+                    url:'handleAnswerErrorRecord',
+                    params:{
+                      token: getStorageFn('token'),
+                      handle_type: type,
+                      target_id_type: 'itembank_id',
+                      target_id: this.data.itembank_id,
+                      input_answer: ''
+                    },
+                    success:(res)=>{
+                      this.popupVisible = true
+                      if(type == 'del'){
+                        this.data.has_error_record = 0
+                      }
+                      else{
+                        this.data.has_error_record = 1
+                      }
+                    },
+                    fail:(err)=>{
+                    }
+                  })
+                },
+                // 答题
+                answer(answer) {
+                    if(this.data.itembank_type == 'judge' || this.data.itembank_type == 'onechoice'){
+                        ajax({
+                          url:'answer',
+                          params:{
+                            token : getStorageFn('token'),
+                            itembank_id: this.data.itembank_id,
+                            input_answer: answer,
+                          },
+                          success:(res)=>{
+                            this.getItembankInfo()
+                          },
+                          fail:(err)=>{
+                            console.log(JSON.stringify(err));
+                          }
+                        })
+                    }
+                    else{
+                        var flag = this.myAnswers.includes(answer)
+                        if(!flag){
+                          this.myAnswers.push(answer)
+                          this.options.forEach(items=>{
+                            if(items.answer == answer){
+                              items.select = 1
+                            }
+                          })
+                        }
+                        else{
+                          var index = this.myAnswers.findIndex(function(item){
+                            return item == answer
+                          })
+                          this.myAnswers.splice(index,1)
+                          this.options.forEach(items=>{
+                            if(items.answer == answer){
+                              items.select = 0
+                            }
+                          })
+                        }
+                    }
+                },
+                // 非判断及单选答题
+                answers() {
+                    var answer = ''
+                    if(this.data.itembank_type == 'judge' || this.data.itembank_type == 'onechoice'){
+                      return
+                    }
+                    if(this.data.itembank_type == 'manychoice'){
+                      this.myAnswers.forEach(item=>{
+                        answer += item + ','
+                      })
+                    }
+                    else{
+                      this.options.forEach(item=>{
+                        answer += item.answer + ','
+                      })
+                    }
+                    if(!answer){
+                      return
+                    }
+                    ajax({
+                      url:'answer',
+                      params:{
+                        token : getStorageFn('token'),
+                        itembank_id: this.data.itembank_id,
+                        input_answer: answer.slice(0,-1),
+                      },
+                      success:(res)=>{
+                        this.getItembankInfo()
+                      },
+                      fail:(err)=>{
+                        console.log(JSON.stringify(err));
+                      }
+                    })
+                },
+                // 弹框控制
+                close() {
+                    this.popupVisible = false
+                },
+                // 查看答题卡
+                toRecord() {
+                    this.goW('practiceAnswerRecords', './practice-answer-records.html', {
+                        test_id: this.id,
+                        use_time: this.useTime
+                    }, 1)
+                },
+            },
+            mounted() {
+                this.getItembankInfo()
+                this.listeners()
+            },
+        })
+    }
+</script>
+
+</html>

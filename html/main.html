@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>Hello APP</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <style>
+      html,body{
+        background: transparent;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+    </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/vue.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        // 自定义夜间模式
+        var type = getStorageFn('type') || 'white'
+
+        var NVTabBar = api.require('NVTabBar');
+
+        listener('keyback',function(res){
+          api.closeToWin({
+              name: 'main'
+          });
+        })
+
+        listener('setPattern',function(res){
+          type = getStorageFn('type') || 'white'
+
+          // 设置底部导航夜间模式
+          NVTabBar.close();
+          app.openNav()
+
+          closeF('practice')
+          closeF('wrong')
+          closeF('search')
+          closeF('me')
+        })
+
+        // 去错题页面
+        listener('toWrong',function(){
+          NVTabBar.setSelect({
+              index: 1,
+              selected: true,
+          });
+          var width = api.winWidth
+          var height = api.winHeight - 65
+          function bgColor(value){
+            var result = type == 'white' ? value : '#191818'
+            return result
+          }
+          goF('wrong','./wrong/wrong.html',{},0,0,width,height,0,false,bgColor('#f6f6f6'))
+          api.bringFrameToFront({from: 'wrong'});
+        })
+
+        var app = new Vue({
+            el: "#app",
+            data: {},
+            methods: {
+                // 底部导航
+                openNav() {
+                    var [white,dark] = [['#ffffff','#999999','#333333'],['#000000','#ffffff','#3a77c8']]
+                    var [bgColor,fontNormalColor,fontSelectColor] = type == 'white' ? white : dark
+                    NVTabBar.open({
+                        styles: {
+                            bg: bgColor,
+                            h: 65,
+                            dividingLine: {     //（可选项）JSON对象；模块顶部的分割线配置
+                               width: 0.5,      //（可选项）数字类型；分割线粗细；默认：0.5
+                               color: type == 'white' ? '#f6f6f6' : '#000'    //（可选项）字符串类型；分割线颜色；默认：#000
+                            },
+                            badge: {
+                                size: 6.0,
+                                centerX: 40,
+                                centerY: 6
+                            }
+                        },
+                        items: [{
+                            w: api.winWidth / 4.0,
+                            bg: {
+                               marginB: -3,
+                            },
+                            iconRect: {
+                                w: 24.0,
+                                h: 24.0,
+                            },
+                            icon: {
+                                normal: 'widget://image/icons/practice1.png',
+                                highlight: 'widget://image/icons/practice1.png',
+                                selected: 'widget://image/icons/practice-active.png'
+                            },
+                            title: {
+                                text: '练习',
+                                size: 12.0,
+                                normal: fontNormalColor,
+                                selected: fontSelectColor,
+                                marginB: 6.0
+                            }
+                        }, {
+                            w: api.winWidth / 4.0,
+                            bg: {
+                               marginB: -3,
+                            },
+                            iconRect: {
+                                w: 24.0,
+                                h: 24.0,
+                            },
+                            icon: {
+                                normal: 'widget://image/icons/wrong.png',
+                                highlight: 'widget://image/icons/wrong.png',
+                                selected: 'widget://image/icons/wrong-active.png'
+                            },
+                            title: {
+                                text: '错题',
+                                size: 12.0,
+                                normal: fontNormalColor,
+                                selected: fontSelectColor,
+                                marginB: 6.0
+                            }
+                        } , {
+                            w: api.winWidth / 4.0,
+                            bg: {
+                               marginB: -3,
+                            },
+                            iconRect: {
+                                w: 24.0,
+                                h: 24.0,
+                            },
+                            icon: {
+                                normal: 'widget://image/icons/search.png',
+                                highlight: 'widget://image/icons/search.png',
+                                selected: 'widget://image/icons/search-active.png'
+                            },
+                            title: {
+                                text: '查找',
+                                size: 12.0,
+                                normal: fontNormalColor,
+                                selected: fontSelectColor,
+                                marginB: 6.0
+                            }
+                        }, {
+                            w: api.winWidth / 4.0,
+                            bg: {
+                               marginB: -3,
+                            },
+                            iconRect: {
+                                w: 24.0,
+                                h: 24.0,
+                            },
+                            icon: {
+                                normal: 'widget://image/icons/me.png',
+                                highlight: 'widget://image/icons/me.png',
+                                selected: 'widget://image/icons/me-active.png'
+                            },
+                            title: {
+                                text: '我的',
+                                size: 12.0,
+                                normal: fontNormalColor,
+                                selected: fontSelectColor,
+                                marginB: 6.0
+                            }
+                        }],
+                        selectedIndex: 0
+                    }, function(ret, err) {
+                      // 导航切换打开不同主页头部
+                      var navIndex = ret.index ? ret.index : 0
+                      var width = api.winWidth
+                      var height = api.winHeight - 65
+                      function bgColor(value){
+                        var result = type == 'white' ? value : '#191818'
+                        return result
+                      }
+                      listener('login',function(res){
+                        NVTabBar.setSelect({
+                            index: 0,
+                            selected: true,
+                        });
+                        goF('practice','./practice/practice.html',{},0,0,width,height,0,false,bgColor('#f6f6f6'))
+                      })
+                      if(navIndex == 0){
+                        goF('practice','./practice/practice.html',{},0,0,width,height,0,false,bgColor('#f6f6f6'))
+                      }else if(navIndex == 1){
+                        goF('wrong','./wrong/wrong.html',{},0,0,width,height,0,false,bgColor('#f6f6f6'))
+                      }else if(navIndex == 2){
+                        goF('search','./search/search.html',{},0,0,width,height,0,false,bgColor('#ffffff'))
+                      }else if(navIndex == 3){
+                        goF('me','./me/me.html',{},0,0,width,height,1,false,bgColor('#ffffff'))
+                      }
+                    });
+                }
+            },
+            mounted() {
+                this.openNav()
+
+                //  是否缓存已选科目
+                var course_id = getStorageFn('course_id')
+                var exam_time = getStorageFn('exam_time')
+                setGlobalDataFn('course_id',course_id)
+                setGlobalDataFn('exam_time',exam_time)
+                if(!getGlobalDataFn('course_id')){
+                  var _this = this
+                  setTimeout(function(){
+                    _this.goW('switchSubject','./settings/setting-switch-subject.html',{},0)
+                  },500)
+                }
+            }
+        })
+    }
+</script>
+
+</html>

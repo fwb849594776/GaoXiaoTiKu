@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <style media="screen">
+    html,body{
+      width: 100%;
+      height: 100%;
+    }
+    .headerInner{
+      height: 12vw;
+    }
+    .list li{
+      display: flex;
+      padding: 0 4vw;
+      background: #ffffff;
+      justify-content: flex-start;
+      align-items: center;
+      height: 14.53vw;
+      border-bottom: 0.2vw solid #f6f6f6;
+    }
+    .list li img{
+      width: 10.67vw;
+      height: 10.67vw;
+      margin-right: 2.67vw;
+    }
+    p{
+      line-height: 5vw;
+    }
+    .title{
+      font-size: 3.73vw;
+    }
+    .subtitle{
+      font-size: 3vw;
+    }
+    .line{
+      width: 100vw;
+      height: 2.67vw;
+      background: #f6f6f6;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner">
+    </div>
+    <ul class="list">
+      <li @click="jump('cloudLogin','./clouds/cloud-login.html',{},1)">
+        <img src="../../image/icons/icon25.png" alt="">
+        <div class="content">
+          <p class="title normal-color">云同步</p>
+          <p class="subtitle color-99">与云端同步做记录</p>
+        </div>
+      </li>
+      <li @click="goW('settingNotice','./setting-notice.html',{},1)">
+        <img src="../../image/icons/icon26.png" alt="">
+        <div class="content">
+          <p class="title normal-color">查看通知</p>
+          <p class="subtitle color-99">获取更多信息</p>
+        </div>
+      </li>
+      <div class="line"></div>
+      <li @click="jump('settingActivation','./setting-activation.html',{},1)">
+        <img src="../../image/icons/icon27.png" alt="">
+        <div class="content">
+          <p class="title normal-color">激活</p>
+          <p class="subtitle color-99">激活课程</p>
+        </div>
+      </li>
+      <li @click="jump('settingPhone','./setting-phone.html',{},1)">
+        <img src="../../image/icons/icon28.png" alt="">
+        <div class="content">
+          <p class="title normal-color">换手机</p>
+          <p class="subtitle color-99">有效期内更换两次，不允许超过三年</p>
+        </div>
+      </li>
+      <div class="line"></div>
+      <li @click="jump('settingTeachNote','./setting-teach-note.html',{},1)">
+        <img src="../../image/icons/icon53.png" alt="">
+        <div class="content">
+          <p class="title normal-color">查讲义</p>
+          <p class="subtitle color-99">查询知识点讲义内容</p>
+        </div>
+      </li>
+      <li @click="goW('settingSize','./setting-size.html',{},1)">
+        <img src="../../image/icons/icon52.png" alt="">
+        <div class="content">
+          <p class="title normal-color">文字大小设置</p>
+          <p class="subtitle color-99"></p>
+        </div>
+      </li>
+      <div class="line"></div>
+      <li @click="setPattern">
+        <img src="../../image/icons/icon27.png" alt="">
+        <div class="content">
+          <p class="title normal-color">夜间模式</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+apiready = function(){
+  // 自定义夜间模式
+  var type = getStorageFn('type') || 'white'
+
+  var [html, lines, normalColor, lis] = [$api.dom("html"), $api.domAll('.line'), $api.domAll('.normal-color'), $api.domAll('li')];
+  lines.forEach(item => {
+    $api.css(item, 'background:' + (type == 'white' ? '' : '#000000'))
+  })
+  normalColor.forEach(item => {
+    setTextColor(item,type,'color')
+  })
+  lis.forEach(item => {
+    setBorderColor(item,type,'#464444')
+    setTextColor(item, type)
+  })
+  setBgColor(html,type,'page')
+
+  setHeader({
+    canBack: true,
+    title: '设置',
+    rType: 'img',
+    rImg: type == 'white' ? '../../image/icons/icon23.png' : '../../image/icons/icon50.png',
+    bgType: type == 'white' ? false : true,
+  },type)
+
+  // 监听导航右击事件
+  api.addEventListener({
+      name: 'rightClick'
+  }, function(ret, err){
+    if(ret.value.rtype == 'img'){
+      app.goW('switchSubject','./setting-switch-subject.html',{},1)
+    }
+  });
+
+  var app = new Vue({
+    el:"#app",
+    data:{
+      pattern: getStorageFn('type') || 'white'
+    },
+    methods:{
+      setPattern(){
+        var type = this.pattern == 'white' ? 'dark' : 'white'
+        this.pattern = type
+        setStorageFn([{key:'type',value:type}])
+        var type = getStorageFn('type') || 'white'
+        sends('setPattern')
+
+        var _this = this
+        api.showProgress({
+            title: '',
+            text: '请稍后...',
+            modal: true
+        });
+        setTimeout(function(){
+          _this.back()
+        },2000)
+
+        // closeF('header')
+        //
+        // setHeader({
+        //   canBack: true,
+        //   title: '设置',
+        //   rType: 'img',
+        //   rImg: '../../image/icons/icon50.png',
+        //   bgType: type == 'white' ? false : true,
+        // },type)
+
+        // var [html, lines, normalColor, lis] = [$api.dom("html"), $api.domAll('.line'), $api.domAll('.normal-color'), $api.domAll('li')];
+        // lines.forEach(item => {
+        //   $api.css(item, 'background:' + (type == 'white' ? '' : '#000000'))
+        // })
+        // normalColor.forEach(item => {
+        //   setTextColor(item,type,'color')
+        // })
+        // lis.forEach(item => {
+        //   setBorderColor(item,type,'#464444')
+        //   setTextColor(item, type)
+        // })
+        // setBgColor(html,type,'page')
+      },
+      jump(){
+        toast('敬请期待...')
+      },
+    },
+    mounted(){
+
+    }
+  })
+}
+</script>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <style media="screen">
+  .header-inner{
+    line-height: 12vw;
+    width: 100%;
+    position: fixed;
+    border-bottom: 0.2vw solid #eeeeee;
+    text-align: center;
+  }
+  .header-inner-dark{
+    background: #000000!important;
+    border-color: #222222!important
+  }
+  .normal-color-dark{
+    color: #ffffff!important;
+  }
+  .header-inner .left{
+    position: absolute;
+    left: 4vw;
+  }
+  .header-inner .left img{
+    height: 5vw;
+    position: absolute;
+    top: 3.5vw;
+    left: 0;
+  }
+  .title{
+    width: 40vw;
+    position: absolute;
+    left: 30vw;
+    text-align: center;
+    font-size: 4.5vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .right{
+    position: absolute;
+    right: 4vw;
+  }
+  .right img{
+    height: 5vw;
+    position: absolute;
+    top: 3.5vw;
+    right: 0;
+  }
+  .titleArr{
+    overflow: hidden;
+    width: auto;
+    position: static;
+    margin: 2vw auto;
+    border-radius: 1.47vw;
+	  border: solid 0.2vw #2066c4;
+    height: 8vw;
+    line-height: 8vw;
+  }
+  .titleArr span{
+    width: 21.6vw;
+    float: left;
+    border-radius: 1.47vw;
+    font-size: 4vw;
+  }
+  .titleArr span.active{
+    color: #ffffff!important;
+    background-image: linear-gradient(0deg,
+		#2066c3 0%,
+		#3c87eb 100%);
+  }
+
+  </style>
+  <title>Document</title>
+</head>
+<body>
+<div id="app">
+  <div class="header-inner">
+      <div class="left">
+        <!-- <img src="../../image/icons/icon24.png" alt="" @click="backFn" v-if="canBack && !bgColor">
+        <img src="../../image/icons/backw.png" alt="" @click="backFn" v-if="canBack && bgColor"> -->
+        <img src="../../image/icons/icon24.png" alt="" @click="backFn" v-if="canBack && (!bgType || !bgColor)">
+        <img src="../../image/icons/backw.png" alt="" @click="backFn" v-if="canBack && (bgType || bgColor)">
+      </div>
+      <!-- <span :class="['normal-color','title',{'normal-color-dark': bgColor}]" v-if="titleType == 'string'">{{title}}</span> -->
+      <span :class="['normal-color','title',{'normal-color-dark': (bgType || bgColor)}]" v-if="titleType == 'string'">{{title}}</span>
+      <span class="normal-color title titleArr" v-else>
+        <span v-for="(item,index) in title" :key="index" :class="['color-1e64c1',{'active':active == index}]" @click="changeTitle(index)">{{item}}</span>
+      </span>
+      <div class="right" @click="rightClick">
+        <span :class="['normal-color',{'normal-color-dark':(bgType || bgColor)}]" v-if="rType == 'text'">{{rText}}</span>
+         <img v-if="rType == 'img'" :src="rImg" alt="">
+      </div>
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    var header = $api.dom('.header-inner')
+
+    // 沉浸式导航
+    $api.css(header,'height:' + (api.safeArea.top + (api.winWidth / 100) * 12) + 'px')
+    $api.css(header,'padding-top:' + api.safeArea.top + 'px')
+
+    // 带背景色的标题
+    if(api.pageParam.bgColor){
+      $api.css(header,'background-color:' + api.pageParam.bgColor)
+      $api.css(header,'border-color:' + api.pageParam.bgColor)
+    }
+
+    // 开启夜间模式
+    if(api.pageParam.bgType){
+      $api.addCls(header, 'header-inner-dark');
+    }
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        // 是否有返回键
+        canBack: api.pageParam.canBack || false,
+        // 标题
+        title: api.pageParam.title || '',
+        // 是否为标题数组
+        titleType: 'string',
+        // 标题右部分文字
+        rType: api.pageParam.rType || '',
+        // 右文字内容
+        rText: api.pageParam.rText || '',
+        // 右图片路径
+        rImg: api.pageParam.rImg || '',
+        // 标题数组动态设置
+        active: 0,
+        // 是否开启夜间模式
+        bgType: api.pageParam.bgType || false,
+        // 自定义背景颜色
+        bgColor: false,
+      },
+      methods:{
+        rightClick(){
+          api.sendEvent({
+              name: 'rightClick',
+              extra: {
+                rtype: this.rType
+              }
+          });
+
+        },
+        backFn(){
+          sends('back')
+          if(this.title == '云同步账号'){
+            return
+          }
+          this.back()
+        },
+        changeTitle(index){
+          this.active = index
+          api.sendEvent({
+              name: 'changeTitle',
+              extra: {
+                  index: index,
+              }
+          });
+
+        }
+      },
+      mounted(){
+        // 获取标题数组
+        if(api.pageParam.title){
+          this.titleType = typeof(api.pageParam.title)
+        }
+        // 是否自定义标题背景
+        if(api.pageParam.bgColor){
+          this.bgColor = true
+        }
+      }
+    })
+  }
+</script>
+</html>

@@ -1,0 +1,58 @@
+.headerInner {
+    height: 12vw;
+}
+#popup div.btns span{
+  width: 100%;
+}
+#popup3 .mint-popup{
+  background: transparent;
+}
+#popup{
+  width: 64.93vw;
+  padding-top: 1.87vw;
+  background: rgba(0,0,0,0)
+}
+div.popup-inner{
+  width: 61.6vw;
+  position: relative;
+  background: #fff;
+  padding: 2vw 0 2.47vw 0;
+  border-radius: 2vw;
+}
+div.popup-inner>img{
+  width: 6.93vw!important;
+  height: 6.93vw!important;
+  object-fit: cover;
+  position: absolute;
+  top: -1.87vw!important;
+  right: -3.33vw!important;
+}
+.popup-inner>div img{
+  width: 57.33vw;
+  height: 26.8vw;
+  object-fit: cover;
+}
+.popup-inner p{
+  font-size: 3.73vw;
+  color: #333;
+  line-height: 12vw;
+}
+.popup-inner p.btn{
+  width: 26.67vw;
+  line-height: 7.33vw;
+  border-radius: 3.67vw;
+  border: solid 0.13vw #2066c2;
+  margin: 3vw auto;
+  color: #2066c2
+}
+.btn-active{
+  background-image: none!important;
+  color: #1e64c1!important;
+  border: 0.2vw solid #1e64c1;
+}
+.normal-dark-color{
+  color: #fff!important;
+}
+.line-dark-color{
+  background-color: rgba(0,0,0,0)
+}

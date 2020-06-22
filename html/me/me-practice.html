@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/common.css">
+  <link rel="stylesheet" href="../../css/mint.css">
+  <link rel="stylesheet" href="../../css/subjectList.css">
+  <style media="screen">
+    .headerInner{
+      height: 12vw;
+    }
+    #popup .popuptitle{
+      padding-top: 6vw;
+      line-height: 22.54vw!important;
+    }
+    #popup div.btns{
+      height: 13.47vw;
+      align-items: center;
+      padding: 0 4.67vw;
+    }
+    #popup div.btns span{
+      width: 20vw;
+      height: 7.33vw;
+    	line-height: 7.33vw;
+    	border-radius: 3.67vw;
+    	border: solid 0.2vw #1e64c1;
+      color: #1e64c1
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <div class="headerInner"></div>
+    <ul v-cloak>
+      <li v-for="(item,index) in list" :key="index">
+        <div class="list-left">
+          <p class="title normal-color">{{item.title}}</p>
+          <p><span>日期：{{item.update_time_text}}  答题：</span><span class="color-1e64c1">{{item.answer_record_count}}/{{item.itembank_count}}</span></p>
+        </div>
+        <div class="list-right color-1e64c1">
+          <p class="btnDark" @click="toRecord(item.id,item.answer_record_count)">继续答题</p>
+        </div>
+      </li>
+    </ul>
+    <div class="noData" v-if="list.length == 0">暂无记录~</div>
+  </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/mint.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/router.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+    // 自定义夜间模式
+    var type = getStorageFn('type') || 'white'
+    setHeader({
+      canBack:true,
+      title:"练习记录",
+      bgType: type == 'white' ? false : true,
+    },type)
+
+    setCommonListDark(type)
+    var [noData,btns] = [$api.dom('.noData'),$api.domAll('.btnDark')]
+    setTextColor(noData,type,'color')
+    btns.forEach(item=>{
+      setBorderColor(item,type,'#464444')
+    })
+
+    var refreshbgColor = type == 'white' ? '#f6f6f6' : '#000000'
+    var refreshTextColor = type == 'white' ? '#333333' : '#ffffff'
+    refresh(refreshbgColor,refreshTextColor,function(res){
+      app.getUserPractiseRecord()
+    })
+
+    var app = new Vue({
+      el:"#app",
+      data:{
+        list:[]
+      },
+      methods:{
+        toRecord(id,index){
+          ajax({
+              url:'getItembankInfo',
+              params:{
+                token: getStorageFn('token'),
+                test_id: id,
+                page: 1
+              },
+              success:(res)=>{
+                this.goW('practiceQues','../practice/practice-ques.html',{id:id,index:(index * 1 + 1)},1)
+              },
+              fail:(err)=>{
+                if(err.code == 40010){
+                  toast(err.msg)
+                  return
+                }
+              }
+            })
+
+        },
+        getUserPractiseRecord(){
+          ajax({
+            url:'getUserPractiseRecord',
+            params:{
+              token:getStorageFn('token')
+            },
+            success:(res)=>{
+              if(!res.data){
+                this.list = []
+              }
+              else{
+                this.list = res.data
+              }
+              api.refreshHeaderLoadDone()
+            },
+            fail:(err)=>{
+              console.log(JSON.stringify(err));
+            }
+          })
+        }
+      },
+      mounted(){
+        this.getUserPractiseRecord()
+      }
+    })
+  }
+</script>
+</html>

@@ -1,0 +1,59 @@
+.content{
+  padding: 0 13.33vw;
+}
+.flex{
+  display: flex;
+  align-items: center;
+}
+.logo{
+  text-align: center;
+  margin: 12.67vw 0 13.2vw 0;
+}
+img{
+  height: 4vw;
+}
+.logo img{
+  width: 18.67vw;
+  height: 18.67vw;
+  object-fit: cover;
+}
+li{
+  height: 10.67vw;
+  background-color: #f6f6f6;
+  border-radius: 5.33vw;
+  margin: 5.33vw auto 0;
+  padding:0 6vw;
+  box-sizing: border-box;
+}
+li input{
+  margin-left: 2.4vw;
+  outline: none;
+  font-size: 3.8vw;
+}
+div.funs{
+  padding: 0 3vw;
+  justify-content: space-between;
+  margin:4vw 0 23vw 0;
+  font-size: 3vw;
+  line-height: 6vw;
+}
+div.funs>span:first-child{
+  position: relative;
+}
+div.funs>span:first-child::after{
+  content: '';
+  width: 1.27vw;
+  height: 2vw;
+  background-image: url('../../image/icons/icon32.png');
+  position: absolute;
+  top: 2vw;
+  right: -1.5vw;
+  background-size: contain;
+}
+div.button{
+  margin-top: 2.67vw;
+}
+div.button span{
+  margin-left: 0;
+  width: 73.33vw;
+}

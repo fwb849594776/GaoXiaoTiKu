@@ -1,0 +1,39 @@
+ul{
+  padding: 0 4vw;
+  background: #fff;
+}
+ul li{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 0.2vw solid #f6f6f6;
+  padding:4vw 0 2.4vw 0;
+}
+.list-left p{
+  line-height: 8vw;
+  font-size: 3.8vw;
+}
+.list-left p span{
+  font-size: 3.5vw;
+}
+.list-right{
+  /*width: 19.33vw;
+  height: 6.67vw;*/
+  /*line-height: 6.87vw;
+  background-color: #ffffff;
+  border-radius: 3.33vw;
+  border: solid 0.2vw #1e64c1;
+  font-size: 3.5vw;
+  text-align: center;*/
+}
+.list-right p{
+  width: 19.33vw;
+  height: 6.67vw;
+  line-height: 7.07vw;
+  background-color: #ffffff;
+  border-radius: 3.33vw;
+  border: solid 0.2vw #1e64c1;
+  font-size: 3.5vw;
+  text-align: center;
+  margin: 2vw 0;
+}
